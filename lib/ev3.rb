@@ -1,6 +1,8 @@
 # https://github.com/larskanis/libusb
 require "libusb"
 
+require "ev3/op"
+
 module Ev3
   class UsbConnection
     # To get to the endpoint we need to descend down the hierarchy of
