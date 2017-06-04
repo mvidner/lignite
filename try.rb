@@ -103,7 +103,14 @@ sinsb = sysop.list_files(9999, "/home/root/lms2012/prjs/")
 # fixme this also prints the 4 byte length and 1 byte handle
 print ms.system_command_with_reply(sinsb)
 
-insb = op.sound_tone(2, 1760, 500)
+insb = op.sound_tone(2, 880, 500)
+ms.direct_command(insb)
+
+insb = op.ui_draw_clean
+ms.direct_command(insb)
+insb = op.ui_draw_text(1, 20, 40, "Hello, world!")
+ms.direct_command(insb)
+insb = op.ui_draw_update
 ms.direct_command(insb)
 
 layer = 0
