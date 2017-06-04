@@ -1,3 +1,5 @@
+require "yaml"
+
 module Ev3
   module Bytes
     def u8(n)
@@ -16,15 +18,66 @@ module Ev3
   class Op
     include Bytes
 
-#    op :sound, 0x94 do
-#      subop :break, 0 # param: []
-#      subop :tone, 1, param: [
-#              input(:par8, :volume),
-#              input(:par16, :frequency),
-#              input(:par16, :duration)
-#            ]
-#
-#    end
+    class TODO < StandardError
+    end
+
+    def self.load_op(oname, odata)
+      osym = oname.downcase.to_sym
+      ovalue = odata["value"]
+      oparams = odata["params"]
+      oparams.each do |par|
+        case par["type"]
+        when "SUBP"
+          raise TODO
+        when "PARF"             # float
+          raise TODO
+        when "PARLAB"           # a label, only one opcode
+          raise TODO
+        when "PARNO"            # variable number of params
+          raise TODO
+        when "PARS"             # string
+          raise TODO
+        when "PARV"             # value, type depends
+          raise TODO
+        when "PARVALUES"
+          raise TODO
+        when "PAR16", "PAR32", "PAR8"
+          # we can do this with primpar
+        end
+      end
+
+      define_method(osym) do |*args|
+        puts "called #{osym} with #{args.inspect}"
+        bytes = u8(ovalue)
+        # assuming all args can behandled with primpar
+        bytes += args.map { |a| primpar(a) }.join("")
+        puts "returning bytecode: #{bytes.inspect}"
+        bytes
+      end
+    end
+
+    def self.load_yml
+      op_hash = YAML.load_file("ev3.yml")["ops"]
+      op_hash.each do |oname, odata|
+        begin
+          load_op(oname, odata)
+        rescue TODO
+        end
+      end
+    end
+
+    # a manual definition with a trailing _
+    def output_step_speed_(layer, nos, speed,
+                          step_begin, step_do, step_end, brake)
+      u8(0xae) + \
+            primpar(layer) + \
+            primpar(nos) + \
+            primpar(speed) + \
+            primpar(step_begin) + \
+            primpar(step_do) + \
+            primpar(step_end) + \
+            primpar(brake)
+    end
 
     def sound_tone(volume, frequency, duration_ms)
       u8(0x94) + primpar(1) + \

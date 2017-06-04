@@ -94,12 +94,25 @@ c = Ev3::UsbConnection.new
 
 ms = MessageSender.new(c)
 
+Ev3::Op.load_yml
 op = Ev3::Op.new
-insb = op.sound_tone(2, 1760, 500)
-ms.direct_command(insb)
 
 sysop = Ev3::SysOp.new
 sinsb = sysop.list_files(9999, "/home/root/lms2012/prjs/")
 
 # fixme this also prints the 4 byte length and 1 byte handle
 print ms.system_command_with_reply(sinsb)
+
+insb = op.sound_tone(2, 1760, 500)
+ms.direct_command(insb)
+
+layer = 0
+nos = Ev3::PORT_B
+speed = 100
+step_begin = 0
+step_do = 360
+step_end = 0
+brake = 1
+insb = op.output_step_speed(layer, nos, speed,
+                            step_begin, step_do, step_end, brake)
+ms.direct_command(insb)
