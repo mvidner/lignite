@@ -8,6 +8,10 @@ module Ev3
       u8(n & 0xff) + u8(n >> 8)
     end
 
+    def f32(float)
+      [float].pack("e")
+    end
+
     def unpack_u16(s)
       s.unpack("S<").first
     end

@@ -1,12 +1,7 @@
 require "yaml"
 
 module Ev3
-  # A String of bytes (with Encoding::BINARY)
-  class ByteString < String
-    # empty class, just for documentation purposes
-  end
-
-  class Op
+  class OpCompiler
     include Bytes
 
     class TODO < StandardError
@@ -31,8 +26,6 @@ module Ev3
     def self.define_op(oname, ovalue, cvalue, params)
       param_handlers = params.map do |par|
         case par["type"]
-        when "PARF"             # float
-          raise TODO
         when "PARLAB"           # a label, only one opcode
           raise TODO
         when "PARNO"            # variable number of params
@@ -43,7 +36,7 @@ module Ev3
           raise TODO
         when "PARVALUES"
           raise TODO
-        when "PAR16", "PAR32", "PAR8"
+        when "PAR8", "PAR16", "PAR32", "PARF"
           ->(x) { param_simple(x) }
         else
           raise "Unhandled param type #{par["type"]}"
@@ -79,6 +72,10 @@ module Ev3
       end
     end
 
+    def initialize
+      self.class.load_yml
+    end
+
     private
 
     def make_lc(n)
@@ -99,13 +96,15 @@ module Ev3
         make_lc(x).map(&:chr).join("")
       when String
         u8(0x80) + x + u8(0x00)
+      when Float
+        u8(0x83) + f32(x)
       else
         raise ArgumentError, "Unexpected type: #{x.class}"
       end
     end
   end
 
-  class SysOp
+  class SysOpCompiler
     include Bytes
     # FIXME: also declare the out arguments
     def list_files(buf_size, filename)
