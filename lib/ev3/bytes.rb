@@ -8,6 +8,10 @@ module Ev3
       u8(n & 0xff) + u8(n >> 8)
     end
 
+    def u32(n)
+      u16(n & 0xffff) + u16(n >> 16)
+    end
+
     def f32(float)
       [float].pack("e")
     end

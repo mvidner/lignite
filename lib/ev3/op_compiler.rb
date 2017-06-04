@@ -63,7 +63,8 @@ module Ev3
     end
 
     def self.load_yml
-      op_hash = YAML.load_file("ev3.yml")["ops"]
+      fname = File.expand_path("../../../ev3.yml", __FILE__)
+      op_hash = YAML.load_file(fname)["ops"]
       op_hash.each do |oname, odata|
         begin
           load_op(oname, odata)
