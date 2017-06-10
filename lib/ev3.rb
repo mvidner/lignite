@@ -4,6 +4,7 @@ require "ev3/assembler"
 require "ev3/direct_commands"
 require "ev3/message_sender"
 require "ev3/op_compiler"
+require "ev3/sysop_compiler"
 require "ev3/usb_connection"
 
 module Ev3
