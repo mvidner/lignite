@@ -58,6 +58,7 @@ module Ev3
           end
         end
       end
+      puts "Read returning #{got.bytesize} bytes"
       got
     end
   end

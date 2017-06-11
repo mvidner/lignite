@@ -27,5 +27,9 @@ module Ev3
     def unpack_u32(s)
       s.unpack("L<").first
     end
+
+    def hexdump(s)
+      s.unpack("H*").first
+    end
   end
 end

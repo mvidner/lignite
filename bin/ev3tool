@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+require "ev3"
+include Ev3::Bytes
+
+def phandles
+  handles = $sc.list_open_handles
+  puts "OPEN HANDLES: ", hexdump(handles)
+end
+
+def upload(local_filename, brick_filename = nil)
+  data = File.read(local_filename, encoding: Encoding::BINARY)
+  unless brick_filename
+    prj = File.basename(local_filename, ".rbf")
+    brick_filename = "../prjs/#{prj}/#{prj}.rbf"
+  end
+  phandles
+  handle = $sc.begin_download(data.bytesize, brick_filename)
+  phandles
+  $sc.continue_download(handle, data)
+  phandles
+end
+
+conn = Ev3::UsbConnection.new
+$sc = Ev3::SystemCommands.new(conn)
+
+if ARGV[0] == "upload"
+  upload(ARGV[1])
+end

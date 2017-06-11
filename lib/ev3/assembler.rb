@@ -74,7 +74,7 @@ module Ev3
       instance_exec(&body)
       instance_exec { object_end }
       puts "  size #{@bytes.bytesize}"
-      puts "  " + @bytes.unpack("H*").first
+      puts "  " + hexdump(@bytes)
       @objects << Obj.vmthread(body: @bytes, local_bytes: @local_bytes)
     end
 
