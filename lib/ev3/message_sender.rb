@@ -6,7 +6,7 @@ module Ev3
 
     def initialize(connection)
       @c = connection
-      @msg_counter = 0
+      @msg_counter = rand 65536
       @buf = ""
     end
 
@@ -36,8 +36,14 @@ module Ev3
     end
 
     def receive
-      lenbuf = bufread(2)
-      size = unpack_u16(lenbuf)
+      size = nil
+      loop do
+        lenbuf = bufread(2)
+        size = unpack_u16(lenbuf)
+        break unless size.zero?
+        # leftover data?
+        @buf = ""
+      end
 
       res = bufread(size)
       res
