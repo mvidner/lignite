@@ -16,8 +16,16 @@ module Ev3
       [float].pack("e")
     end
 
+    def unpack_u8(s)
+      s.unpack("C").first
+    end
+
     def unpack_u16(s)
       s.unpack("S<").first
+    end
+
+    def unpack_u32(s)
+      s.unpack("L<").first
     end
   end
 end

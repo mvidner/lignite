@@ -6,11 +6,11 @@ require "ev3"
 conn = Ev3::UsbConnection.new
 dc = Ev3::DirectCommands.new(conn)
 
-soc = Ev3::SysOpCompiler.new
-sinsb = soc.list_files(9999, "/home/root/lms2012/prjs/")
-ms = Ev3::MessageSender.new(conn)
-# fixme this also prints the 4 byte length and 1 byte handle
-print ms.system_command_with_reply(sinsb)
+sc = Ev3::SystemCommands.new(conn)
+len, h, list = sc.list_files(9999, "/home/root/lms2012/prjs/")
+p len
+p h
+print list
 
 dc.sound_tone(2, 880, 500)
 

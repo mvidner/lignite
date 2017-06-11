@@ -1,0 +1,290 @@
+sysops:
+  BEGIN_DOWNLOAD:
+    desc: "Begin download (from PC to VM)"
+    value: 0x92
+    params:
+      -
+        name: SIZE
+        type: U32
+        dir: in
+      -
+        name: FILENAME
+        type: ZBYTES
+        dir: in
+      -
+        name: HANDLE
+        type: U8
+        dir: out
+
+  CONTINUE_DOWNLOAD:
+    desc: "Continue download (from PC to VM)"
+    value: 0x93
+    # EXAMPLE: no reply required (0x81)
+    params:
+      -
+        name: HANDLE
+        type: U8
+        dir: in
+      -
+        name: PAYLOAD
+        type: BYTES
+        dir: in
+      -
+        name: HANDLE
+        type: U8
+        dir: out
+
+  BEGIN_UPLOAD:
+    desc: "Begin upload (from VM to PC)"
+    value: 0x94
+    params:
+      -
+        name: BUF_SIZE
+        type: U16
+        dir: in
+      -
+        name: FILENAME
+        type: ZBYTES
+        dir: in
+      -
+        name: FILE_SIZE
+        type: U32
+        dir: out
+      -
+        name: HANDLE
+        type: U8
+        dir: out
+      -
+        name: PAYLOAD
+        type: BYTES
+        dir: out
+
+  CONTINUE_UPLOAD:
+    desc: "Continue upload (from VM to PC)"
+    value: 0x95
+    params:
+      -
+        name: HANDLE
+        type: U8
+        dir: in
+      -
+        name: BUF_SIZE
+        type: U16
+        dir: in
+      -
+        name: HANDLE
+        type: U8
+        dir: out
+      -
+        name: PAYLOAD
+        type: BYTES
+        dir: out
+
+  BEGIN_GETFILE:
+    desc: "datalog to PC"
+    value: 0x96
+    params:
+      -
+        name: BUF_SIZE
+        type: U16
+        dir: in
+      -
+        name: FILENAME
+        type: ZBYTES
+        dir: in
+      -
+        name: FILE_SIZE
+        type: U32
+        dir: out
+      -
+        name: HANDLE
+        type: U8
+        dir: out
+      -
+        name: PAYLOAD
+        type: BYTES
+        dir: out
+
+  CONTINUE_GETFILE:
+    desc: "Continue getting a dafalog file (from VM to PC)"
+    value: 0x97
+    params:
+      -
+        name: HANDLE
+        type: U8
+        dir: in
+      -
+        name: BUF_SIZE
+        type: U16
+        dir: in
+      -
+        name: FILE_SIZE
+        type: U32
+        dir: out
+      -
+        name: HANDLE
+        type: U8
+        dir: out
+      -
+        name: PAYLOAD
+        type: BYTES
+        dir: out
+
+  CLOSE_FILEHANDLE:
+    desc: "Close a file handle"
+    value: 0x98
+    params:        
+      -
+        name: HANDLE
+        type: U8
+        dir: in
+      -
+        name: HASH
+        type: BYTES
+        desc: "WTF, hash?"
+        dir: in
+
+  LIST_FILES:
+    desc: "List files"
+    value: 0x99
+    params:
+      -
+        name: BUF_SIZE
+        type: U16
+        dir: in
+      -
+        name: FILENAME
+        type: ZBYTES
+        dir: in
+      -
+        name: LIST_SIZE
+        type: U32
+        dir: out
+      -
+        name: HANDLE
+        type: U8
+        dir: out
+      -
+        name: PAYLOAD
+        type: BYTES
+        dir: out
+
+  CONTINUE_LIST_FILES:
+    desc: "Continue listing files"
+    value: 0x9a
+    params:
+      -
+        name: HANDLE
+        type: U8
+        dir: in
+      -
+        name: BUF_SIZE
+        type: U16
+        dir: in
+      -
+        name: HANDLE
+        type: U8
+        dir: out
+      -
+        name: PAYLOAD
+        type: BYTES
+        dir: out
+
+  CREATE_DIR:
+    desc: "Create a directory"
+    value: 0x9b
+    params:
+      -
+        name: FILENAME
+        desc: "Full path"
+        type: ZBYTES
+        dir: in
+
+  DELETE_FILE:
+    desc: "Delete a file"
+    value: 0x9c
+    params:
+      -
+        name: FILENAME
+        desc: "Full path"
+        type: ZBYTES
+        dir: in
+
+  LIST_OPEN_HANDLES:
+    desc: "Get a list of open handles"
+    value: 0x9d
+    params:
+      -
+        name: HANDLE_BITS
+        desc: "bits indicating whether handles are busy (open) or not."
+        type: BYTES
+        dir: out
+
+  WRITE_MAILBOX:
+    # NO REPLY
+    desc: "Write to a mailbox"
+    value: 0x9e
+    params:
+      -
+        name: NAME_LENGTH
+        type: U8
+        dir: in
+      -
+        name: NAME
+        type: ZBYTES
+        dir: in
+      -
+        name: PAYLOAD_SIZE
+        type: U16
+        dir: in
+      -
+        name: PAYLOAD
+        type: BYTES
+        dir: in
+      
+  BLUETOOTH_PIN:
+    desc: "Set the Bluetooth PIN code"
+    value: 0x9f
+    params:
+      -
+        name: MAC_LENGTH
+        desc: "Length of MAC, not including the NUL terminator"
+        type: U8
+        dir: in
+      -
+        name: MAC
+        type: BYTES
+        dir: in
+      -
+        name: PIN_LENGTH
+        desc: "Length of PIN, not including the NUL terminator"
+        type: U8
+        dir: in
+      -
+        name: PIN
+        type: BYTES
+        dir: in
+      -
+        name: MAC_LENGTH
+        desc: "Length of MAC, not including the NUL terminator"
+        type: U8
+        dir: out
+      -
+        name: MAC
+        type: BYTES
+        dir: out
+      -
+        name: PIN_LENGTH
+        desc: "Length of PIN, not including the NUL terminator"
+        type: U8
+        dir: out
+      -
+        name: PIN
+        type: BYTES
+        dir: out
+    
+  ENTER_FW_UPDATE:
+    # NO REPLY
+    desc: "Enter Firmware update mode"
+    value: 0xa0
+    params: []
