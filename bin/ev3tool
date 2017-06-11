@@ -13,16 +13,44 @@ def upload(local_filename, brick_filename = nil)
     prj = File.basename(local_filename, ".rbf")
     brick_filename = "../prjs/#{prj}/#{prj}.rbf"
   end
-  phandles
   handle = $sc.begin_download(data.bytesize, brick_filename)
-  phandles
   $sc.continue_download(handle, data)
-  phandles
+end
+
+def download(brick_filename, local_filename = nil)
+  local_filename ||= File.basename(brick_filename)
+  fsize, handle, data = $sc.begin_upload(4096, brick_filename)
+  File.open(local_filename, "w") do |f|
+    loop do
+      f.write(data)
+      fsize -= data.bytesize
+      break if fsize.zero?
+      handle, data = $sc.continue_upload(handle, 4096)
+    end
+  end
+end
+
+def list_files(name)
+  name ||= "../prjs"
+  result = ""
+  fsize, handle, data = $sc.list_files(4096, name)
+  loop do
+    result += data
+    fsize -= data.bytesize
+    break if fsize.zero?
+    handle, data = $sc.continue_list_files(handle, 4096)
+  end
+  result
 end
 
 conn = Ev3::UsbConnection.new
 $sc = Ev3::SystemCommands.new(conn)
 
-if ARGV[0] == "upload"
+case ARGV[0]
+when "upload", "ul"
   upload(ARGV[1])
+when "download", "dl"
+  download(ARGV[1], ARGV[2])
+when "list", "ls"
+  print list_files(ARGV[1])
 end
