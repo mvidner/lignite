@@ -1,8 +1,8 @@
-module Ev3
+module Lignite
 
   # FIXME: Possibly merge with Connection (UsbConnection)
   class MessageSender
-    include Ev3::Bytes
+    include Lignite::Bytes
 
     def initialize(connection)
       @c = connection

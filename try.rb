@@ -1,12 +1,12 @@
 #!/usr/bin/ruby
 $: << "lib"
 
-require "ev3"
+require "lignite"
 
-conn = Ev3::UsbConnection.new
-dc = Ev3::DirectCommands.new(conn)
+conn = Lignite::UsbConnection.new
+dc = Lignite::DirectCommands.new(conn)
 
-sc = Ev3::SystemCommands.new(conn)
+sc = Lignite::SystemCommands.new(conn)
 len, h, list = sc.list_files(9999, "/home/root/lms2012/prjs/")
 p len
 p h
@@ -20,7 +20,7 @@ dc.ui_draw_value(1, 20, 80, Math::PI, 6, 4)
 dc.ui_draw_update
 
 layer = 0
-nos = Ev3::PORT_B
+nos = Lignite::PORT_B
 speed = 100
 step_begin = 0
 step_do = 180

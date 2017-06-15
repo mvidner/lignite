@@ -1,4 +1,4 @@
-module Ev3
+module Lignite
   module Bytes
     def u8(n)
       (n & 0xff).chr

@@ -1,4 +1,4 @@
-module Ev3
+module Lignite
   class Assembler
     include Bytes
 

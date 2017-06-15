@@ -1,4 +1,4 @@
-module Ev3
+module Lignite
   # FIXME: cannot handle replies
   class DirectCommands
     def initialize(conn)

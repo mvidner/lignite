@@ -1,12 +1,12 @@
 #!/usr/bin/ruby
 $: << "../lib"
-require "ev3"
+require "lignite"
 require "fileutils"
 
 def test_case(base_name)
   puts "Test: #{base_name} starting..."
 
-  asm = Ev3::Assembler.new
+  asm = Lignite::Assembler.new
   in_rb = "data/#{base_name}.rb"
   actual_rbf = "data/#{base_name}.out.rbf"
   expected_rbf = "data/#{base_name}.rbf"

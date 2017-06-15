@@ -1,6 +1,6 @@
 require "yaml"
 
-module Ev3
+module Lignite
   class OpCompiler
     include Bytes
 

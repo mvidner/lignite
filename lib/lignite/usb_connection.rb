@@ -1,7 +1,7 @@
 # https://github.com/larskanis/libusb
 require "libusb"
 
-module Ev3
+module Lignite
   class UsbConnection
     # To get to the endpoint we need to descend down the hierarchy of
     # 1. Device
