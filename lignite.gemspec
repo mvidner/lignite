@@ -29,9 +29,14 @@ Gem::Specification.new do |s|
     "lib/lignite/version.rb",
     "lignite.gemspec",
     "sysops.yml",
+    "test/data/HelloWorld-subop.rb",
+    "test/data/HelloWorld-subop.rbf",
     "test/data/HelloWorld.lms",
     "test/data/HelloWorld.rb",
     "test/data/HelloWorld.rbf",
+    "test/data/VernierReadout.lms",
+    "test/data/VernierReadout.rb",
+    "test/data/VernierReadout.rbf",
     "test/testme.rb",
     "try.rb"
   ]

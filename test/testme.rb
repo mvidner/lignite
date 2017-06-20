@@ -19,3 +19,4 @@ def test_case(base_name)
 end
 
 test_case "HelloWorld"
+test_case "HelloWorld-subop"

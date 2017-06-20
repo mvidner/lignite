@@ -7,6 +7,11 @@ module Lignite
     class TODO < StandardError
     end
 
+    def self.load_const(name, value)
+      raise "duplicate constant #{name}" if Lignite.const_defined?(name)
+      Lignite.const_set(name, value)
+    end
+
     def self.load_op(oname, odata)
       ovalue = odata["value"]
       oparams = odata["params"]
@@ -15,11 +20,29 @@ module Lignite
         commands = p1["commands"]
         commands.each do |cname, cdata|
           cvalue = cdata["value"]
+          load_const(cname, cvalue)
           cparams = cdata["params"]
           define_op("#{oname}_#{cname}", ovalue, cvalue, cparams)
         end
+        define_multiop(oname, commands)
       else
         define_op(oname, ovalue, nil, oparams)
+      end
+    end
+
+    def self.define_multiop(oname, commands)
+      names = commands.map do |cname, cdata|
+        csym = cname.downcase.to_sym
+        cvalue = cdata["value"]
+        [cvalue, csym]
+      end.to_h
+
+      osym = oname.downcase.to_sym
+      define_method(osym) do |*args|
+        puts "called #{osym} with #{args.inspect}"
+        cvalue = args.shift
+        csym = names.fetch(cvalue)
+        send("#{osym}_#{csym}", *args)
       end
     end
 
@@ -63,14 +86,21 @@ module Lignite
     end
 
     def self.load_yml
+      return if @loaded
       fname = File.expand_path("../../../ev3.yml", __FILE__)
-      op_hash = YAML.load_file(fname)["ops"]
+      yml = YAML.load_file(fname)
+      op_hash = yml["ops"]
       op_hash.each do |oname, odata|
         begin
           load_op(oname, odata)
         rescue TODO
         end
       end
+      defines = yml["defines"]
+      defines.each do |dname, ddata|
+        load_const(dname, ddata["value"])
+      end
+      @loaded = true
     end
 
     def initialize
