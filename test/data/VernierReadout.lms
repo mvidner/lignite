@@ -1,0 +1,31 @@
+define    PORT      1
+
+vmthread  MAIN
+{
+  DATA32  Timer
+  DATA32  Data1
+  DATAS   String 8
+  
+Loop:
+
+  UI_DRAW(FILLWINDOW,0x00,0,0)
+  UI_DRAW(SELECT_FONT,SMALL_FONT)
+  UI_DRAW(TEXT,FG_COLOR,0,10,'Vernier Readout  V0.00')
+
+  UI_DRAW(TEXT,FG_COLOR,0,50,'Raw 1')
+  UI_DRAW(SELECT_FONT,NORMAL_FONT)
+  
+  INPUT_DEVICE(READY_RAW,0,PORT,1,0,1,Data1)
+
+  AND32(Data1,0xFFFF,Data1)
+  STRINGS(NUMBER_FORMATTED,Data1,'%-5d',8,String)
+  UI_DRAW(TEXT,FG_COLOR,64,50,String)
+  
+  UI_DRAW(UPDATE)
+  
+  TIMER_WAIT(250,Timer)
+  TIMER_READY(Timer)
+
+	JR(Loop)
+}
+

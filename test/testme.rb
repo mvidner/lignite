@@ -20,3 +20,4 @@ end
 
 test_case "HelloWorld"
 test_case "HelloWorld-subop"
+test_case "VernierReadout"

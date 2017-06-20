@@ -34,7 +34,6 @@ module Lignite
     end
 
     def initialize
-      @op_compiler = OpCompiler.new
     end
 
     SIGNATURE = "LEGO"
@@ -47,7 +46,9 @@ module Lignite
       rb_text = File.read(rb_filename)
       @objects = []
       @global_bytes = 0
+
       instance_eval(rb_text, rb_filename, 1)
+
       File.open(rbf_filename, "w") do |f|
         dummy_header = image_header(image_size:0, version: 0, object_count: 0, global_bytes: 0)
         f.write(dummy_header)
@@ -67,21 +68,77 @@ module Lignite
       end
     end
 
-    def vmthread(id, &body)
-      puts "VMTHREAD #{id}"
-      @bytes = ""
-      @local_bytes = 0
-      instance_exec(&body)
-      instance_exec { object_end }
-      puts "  size #{@bytes.bytesize}"
-      puts "  " + hexdump(@bytes)
-      @objects << Obj.vmthread(body: @bytes, local_bytes: @local_bytes)
+    # Allocate local or global variables
+    class Variables
+      def initialize
+        @offset = 0
+        @vars = {}
+      end
+
+      def add(id, size)
+        raise "Duplicate variable #{id}" if @vars.key?(id)
+        @vars[id] = {offset: @offset, size: size}
+        @offset += size
+      end
+
+      def bytesize
+        @offset
+      end
+
+      def key?(sym)
+        @vars.key?(sym)
+      end
+
+      def offset(sym)
+        @vars[sym][:offset]
+      end
     end
 
-    def method_missing(name, *args)
-      super unless @op_compiler.respond_to?(name)
+    def vmthread(id, &body)
+      puts "VMTHREAD #{id}"
+      @locals = Variables.new
+      bodyc = BodyCompiler.new(@locals)
+      bodyc.extend(VariableDeclarer)
+      bodyc.instance_exec(&body)
+      bodyc.instance_exec { object_end }
+      puts "  size #{bodyc.bytes.bytesize}"
+      puts "  " + hexdump(bodyc.bytes)
+      @objects << Obj.vmthread(body: bodyc.bytes, local_bytes: @locals.bytesize)
+    end
 
-      @bytes += @op_compiler.send(name, *args)
+    module VariableDeclarer
+      def data32(id)
+        @locals.add(id, 4)
+      end
+
+      def datas(id, size)
+        @locals.add(id, size)
+      end
+    end
+
+    class BodyCompiler
+      attr_reader :bytes
+      attr_reader :locals
+
+      def initialize(locals)
+        @bytes = ""
+        @locals = locals
+        @op_compiler = OpCompiler.new(nil, @locals)
+      end
+
+      def loop(&body)
+        subc = BodyCompiler.new(@locals)
+        subc.instance_exec(&body)
+        @bytes << subc.bytes
+        # the jump takes up 4 bytes: JR, LC2, LO, HI
+        jr(Complex(- (subc.bytes.bytesize + 4), 2))
+      end
+
+      def method_missing(name, *args)
+        super unless @op_compiler.respond_to?(name)
+
+        @bytes += @op_compiler.send(name, *args)
+      end
     end
   end
 end
