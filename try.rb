@@ -3,7 +3,12 @@ $: << "lib"
 
 require "lignite"
 
-conn = Lignite::UsbConnection.new
+conn = nil
+begin
+  conn = Lignite::UsbConnection.new
+rescue Lignite::NoUsbDevice
+  conn = Lignite::BluetoothConnection.new
+end
 dc = Lignite::DirectCommands.new(conn)
 
 sc = Lignite::SystemCommands.new(conn)

@@ -1,6 +1,7 @@
 require "lignite/bytes"
 
 require "lignite/assembler"
+require "lignite/bluetooth_connection"
 require "lignite/direct_commands"
 require "lignite/message_sender"
 require "lignite/op_compiler"

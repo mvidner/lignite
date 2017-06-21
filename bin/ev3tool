@@ -43,7 +43,13 @@ def list_files(name)
   result
 end
 
-conn = Lignite::UsbConnection.new
+conn = nil
+begin
+  conn = Lignite::UsbConnection.new
+rescue Lignite::NoUsbDevice
+  conn = Lignite::BluetoothConnection.new
+end
+
 $sc = Lignite::SystemCommands.new(conn)
 
 case ARGV[0]

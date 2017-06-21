@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/mvidner/lignite"
   s.license     = "GPL-3.0"
 
+  #  puts `git ls-files`.lines.map { |f| "    %s,\n" % f.strip.inspect }
   s.files       = [
     "Rakefile",
     "VERSION",
@@ -20,6 +21,7 @@ Gem::Specification.new do |s|
     "ev3.yml",
     "lib/lignite.rb",
     "lib/lignite/assembler.rb",
+    "lib/lignite/bluetooth_connection.rb",
     "lib/lignite/bytes.rb",
     "lib/lignite/direct_commands.rb",
     "lib/lignite/message_sender.rb",

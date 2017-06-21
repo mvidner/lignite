@@ -2,6 +2,9 @@
 require "libusb"
 
 module Lignite
+  class NoUsbDevice < RuntimeError
+  end
+
   class UsbConnection
     # To get to the endpoint we need to descend down the hierarchy of
     # 1. Device
@@ -21,6 +24,8 @@ module Lignite
     def initialize
       usb = LIBUSB::Context.new
       @device = usb.devices(idVendor: VENDOR_LEGO, idProduct: PRODUCT_EV3).first
+      raise Lignite::NoUsbDevice if @device.nil?
+
       ## Because multiple configs are rare, the library allows to omit this:
       ## device.set_configuration(CONFIGURATION_EV3)
       @interface = @device.interfaces[INTERFACE_EV3]
