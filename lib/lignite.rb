@@ -3,11 +3,14 @@ require "lignite/logger"
 
 require "lignite/assembler"
 require "lignite/bluetooth_connection"
+require "lignite/body_compiler"
 require "lignite/direct_commands"
 require "lignite/message_sender"
 require "lignite/op_compiler"
+require "lignite/rbf_object"
 require "lignite/sysop_compiler"
 require "lignite/usb_connection"
+require "lignite/variables"
 
 module Lignite
   PORT_A = 1
