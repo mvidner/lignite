@@ -3,6 +3,8 @@ require "yaml"
 module Lignite
   class OpCompiler
     include Bytes
+    include Logger
+    extend Logger
 
     class TODO < StandardError
     end
@@ -39,7 +41,7 @@ module Lignite
 
       osym = oname.downcase.to_sym
       define_method(osym) do |*args|
-        puts "called #{osym} with #{args.inspect}"
+        logger.debug "called #{osym} with #{args.inspect}"
         cvalue = args.shift
         csym = names.fetch(cvalue)
         send("#{osym}_#{csym}", *args)
@@ -70,7 +72,7 @@ module Lignite
 
       osym = oname.downcase.to_sym
       define_method(osym) do |*args|
-        puts "called #{osym} with #{args.inspect}"
+        logger.debug "called #{osym} with #{args.inspect}"
         if check_arg_count && args.size != param_handlers.size
           raise ArgumentError, "expected #{param_handlers.size} arguments, got #{args.size}"
         end
@@ -83,12 +85,14 @@ module Lignite
           # h.call(a) would have self = Op instead of #<Op>
           instance_exec(a, &h)
         end.join("")
-        puts "returning bytecode: #{bytes.inspect}"
+        logger.debug "returning bytecode: #{bytes.inspect}"
         bytes
       end
     rescue TODO
-      puts "Could not define #{oname}"
+      logger.warn "Could not define #{oname}"
     end
+
+    @loaded = false
 
     def self.load_yml
       return if @loaded

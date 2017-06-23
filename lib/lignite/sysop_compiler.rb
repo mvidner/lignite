@@ -1,6 +1,8 @@
 module Lignite
   class SystemCommands
     include Bytes
+    include Logger
+    extend Logger
 
     # @param message_sender [MessageSender]
     def initialize(conn)
@@ -24,7 +26,7 @@ module Lignite
 
       osym = oname.downcase.to_sym
       self.class.send(:define_method, osym) do |*args|
-        puts "called #{osym} with #{args.inspect}"
+        logger.debug "called #{osym} with #{args.inspect}"
         if args.size != param_handlers.size
           raise ArgumentError, "expected #{param_handlers.size} arguments, got #{args.size}"
         end
@@ -34,7 +36,7 @@ module Lignite
           # h.call(a) would have self = Op instead of #<Op>
           instance_exec(a, &h)
         end.join("")
-        puts "sysop to execute: #{bytes.inspect}"
+        logger.debug "sysop to execute: #{bytes.inspect}"
 
         reply = @message_sender.system_command_with_reply(bytes)
 

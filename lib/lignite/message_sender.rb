@@ -2,7 +2,8 @@ module Lignite
 
   # FIXME: Possibly merge with Connection (UsbConnection)
   class MessageSender
-    include Lignite::Bytes
+    include Bytes
+    include Logger
 
     def initialize(connection)
       @c = connection
@@ -12,14 +13,13 @@ module Lignite
 
     def msgid
       @msg_counter += 1
-      puts "MSGID #{@msg_counter}"
+      logger.debug "MSGID #{@msg_counter}"
       @msg_counter
     end
 
     def send(payload)
       packet = u16(payload.bytesize) + payload
-      print "-> "
-      p packet
+      logger.debug "-> #{packet.inspect}"
       @c.write(packet)
     end
 
@@ -30,8 +30,7 @@ module Lignite
       end
       ret = @buf[0, n]
       @buf = @buf[n..-1]
-      print "R<-(#{ret.bytesize})"
-      p ret
+      logger.debug "R<-(#{ret.bytesize})#{ret.inspect}"
       ret
     end
 

@@ -1,6 +1,7 @@
 module Lignite
   class Assembler
     include Bytes
+    include Logger
 
     class Obj
       include Bytes
@@ -95,14 +96,14 @@ module Lignite
     end
 
     def vmthread(id, &body)
-      puts "VMTHREAD #{id}"
       @locals = Variables.new
       bodyc = BodyCompiler.new(@locals)
       bodyc.extend(VariableDeclarer)
       bodyc.instance_exec(&body)
       bodyc.instance_exec { object_end }
-      puts "  size #{bodyc.bytes.bytesize}"
-      puts "  " + hexdump(bodyc.bytes)
+      logger.debug "VMTHREAD #{id}"
+      logger.debug "  size #{bodyc.bytes.bytesize}"
+      logger.debug "  " + hexdump(bodyc.bytes)
       @objects << Obj.vmthread(body: bodyc.bytes, local_bytes: @locals.bytesize)
     end
 

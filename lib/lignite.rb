@@ -1,4 +1,5 @@
 require "lignite/bytes"
+require "lignite/logger"
 
 require "lignite/assembler"
 require "lignite/bluetooth_connection"

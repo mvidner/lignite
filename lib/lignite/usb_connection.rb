@@ -6,6 +6,8 @@ module Lignite
   end
 
   class UsbConnection
+    include Logger
+
     # To get to the endpoint we need to descend down the hierarchy of
     # 1. Device
     VENDOR_LEGO = 0x0694
@@ -63,7 +65,7 @@ module Lignite
           end
         end
       end
-      puts "Read returning #{got.bytesize} bytes"
+      logger.debug "Read returning #{got.bytesize} bytes"
       got
     end
   end
