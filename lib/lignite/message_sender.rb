@@ -7,15 +7,46 @@ module Lignite
 
     def initialize(connection)
       @c = connection
-      @msg_counter = rand 65536
       @buf = ""
     end
 
-    def msgid
-      @msg_counter += 1
-      logger.debug "MSGID #{@msg_counter}"
-      @msg_counter
+    def direct_command(instr_bytes, global_size: 0, local_size: 0)
+      body = u16(var_alloc(global_size: global_size, local_size: local_size)) +
+             instr_bytes
+      cmd = Message.direct_command_no_reply(body)
+      send(cmd.bytes)
     end
+
+    def direct_command_with_reply(instr_bytes, global_size: 0, local_size: 0)
+      body = u16(var_alloc(global_size: global_size, local_size: local_size)) +
+             instr_bytes
+      cmd = Message.direct_command_with_reply(body)
+      send(cmd.bytes)
+
+      reply = Message.reply_from_bytes(receive)
+      assert_match(reply.msgid, cmd.msgid, "Reply id")
+      if reply.error?
+        raise "VMError"         # no details?
+      end
+
+      reply.data
+    end
+
+    def system_command_with_reply(instr_bytes)
+      cmd = Message.system_command_with_reply(instr_bytes)
+      send(cmd.bytes)
+
+      reply = Message.reply_from_bytes(receive)
+      assert_match(reply.msgid, cmd.msgid, "Reply id")
+      assert_match(reply.command, unpack_u8(instr_bytes[0]), "Command num")
+      if reply.error?
+        raise "VMError, %u" % reply.status
+      end
+
+      reply.data
+    end
+
+    private
 
     def send(payload)
       packet = u16(payload.bytesize) + payload
@@ -48,48 +79,14 @@ module Lignite
       res
     end
 
-    def direct_command(instr_bytes, var_alloc: 0)
-      cmd_type = 0x80
-      bytes = u16(msgid) + u8(cmd_type) + u16(var_alloc) +
-              instr_bytes
-      send(bytes)
+    def var_alloc(global_size:, local_size:)
+      var_alloc = global_size & 0x3ff
+      var_alloc |= (local_size & 0x3f) << 10
     end
 
-    def direct_command_with_reply(instr_bytes, var_alloc: 0)
-      cmd_type = 0x00
-      bytes = u16(msgid) + u8(cmd_type) + u16(var_alloc) +
-              instr_bytes
-      send(bytes)
-
-      reply = receive
-      reply
-    end
-
-    def extract_id(data)
-      [unpack_u16(data[0..1]), data[2..-1]]
-    end
-
-    def system_command_with_reply(instr_bytes)
-      cmd_id = msgid
-      cmd_type = 0x01
-
-      bytes = u16(cmd_id) + u8(cmd_type) + instr_bytes
-
-      send(bytes)
-      reply = receive
-
-      id, reply2 = extract_id(reply)
-      raise "Bad system reply id, #{id} != #{cmd_id}" unless id == cmd_id
-
-      rep_type   = reply2[0].ord # 03 sysreply, 05 syserror
-      rep_cmd    = reply2[1].ord
-      rep_status = reply2[2].ord
-      raise "Bad system reply cmd, #{rep_cmd} != #{instr_bytes[0].ord}" unless rep_cmd == instr_bytes[0].ord
-      if rep_type == 0x05
-        raise "VMError, %u" % rep_status
-      end
-      payload = reply2[3..-1]
-      payload
+    def assert_match(actual, expected, description)
+      return if actual == expected
+      raise "#{description} does not match, expected #{expected}, actual #{actual}"
     end
   end
 end

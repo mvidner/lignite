@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
     "lib/lignite/bytes.rb",
     "lib/lignite/direct_commands.rb",
     "lib/lignite/logger.rb",
+    "lib/lignite/message.rb",
     "lib/lignite/message_sender.rb",
     "lib/lignite/op_compiler.rb",
     "lib/lignite/rbf_object.rb",
