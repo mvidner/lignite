@@ -43,6 +43,18 @@ def list_files(name)
   result
 end
 
+def run(name)
+  slot = Lignite::USER_SLOT
+  no_debug = 0
+  $dc.block do
+    # these are local variables
+    data32 :size
+    data32 :ip
+    file_load_image(slot, name, :size, :ip)
+    program_start(slot, :size, :ip, no_debug)
+  end
+end
+
 conn = nil
 begin
   conn = Lignite::UsbConnection.new
@@ -51,6 +63,7 @@ rescue Lignite::NoUsbDevice
 end
 
 $sc = Lignite::SystemCommands.new(conn)
+$dc = Lignite::DirectCommands.new(conn)
 
 case ARGV[0]
 when "upload", "ul"
@@ -59,4 +72,6 @@ when "download", "dl"
   download(ARGV[1], ARGV[2])
 when "list", "ls"
   print list_files(ARGV[1])
+when "run"
+  run(ARGV[1])
 end
