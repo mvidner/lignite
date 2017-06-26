@@ -96,7 +96,7 @@ module Lignite
 
     def self.load_yml
       return if @loaded
-      fname = File.expand_path("../../../ev3.yml", __FILE__)
+      fname = File.expand_path("../../../data/ev3.yml", __FILE__)
       yml = YAML.load_file(fname)
       op_hash = yml["ops"]
       op_hash.each do |oname, odata|

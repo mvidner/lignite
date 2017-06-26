@@ -11,7 +11,7 @@ module Lignite
     end
 
     def load_yml
-      fname = File.expand_path("../../../sysops.yml", __FILE__)
+      fname = File.expand_path("../../../data/sysops.yml", __FILE__)
       op_hash = YAML.load_file(fname)["sysops"]
       op_hash.each do |oname, odata|
         load_op(oname, odata)
