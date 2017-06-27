@@ -33,3 +33,11 @@ step_end = 0
 brake = 1
 dc.output_step_speed(layer, nos, speed,
                      step_begin, step_do, step_end, brake)
+
+# transform the yml to an input for yardoc
+
+# output_{step,time}_{power,speed,sync}
+#  layer, nos
+#  power or speed or (speed, turn, step1/time1)
+#  step123 or time123,
+#  brake
