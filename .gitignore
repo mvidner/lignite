@@ -1,3 +1,7 @@
-/coverage/
+/.bundle/
 /.yardoc/
+/coverage/
 /doc/
+/vendor/
+/Gemfile.lock
+/lignite-*.gem
