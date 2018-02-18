@@ -11,11 +11,13 @@ Gem::Specification.new do |s|
   s.author      = "Martin Vidner"
   s.email       = "martin@vidner.net"
   s.homepage    = "https://github.com/mvidner/lignite"
-  s.license     = "GPL-3.0"
+  s.license     = "GPL-3.0-only"
 
   # ruby -e 'puts `git ls-files`.lines.map { |f| "    %s,\n" % f.strip.inspect }'
   s.files       = [
     ".gitignore",
+    "COPYING",
+    "Gemfile",
     "Rakefile",
     "VERSION",
     "bin/ev3tool",
