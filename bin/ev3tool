@@ -67,7 +67,7 @@ $dc = Lignite::DirectCommands.new(conn)
 
 case ARGV[0]
 when "upload", "ul"
-  upload(ARGV[1])
+  upload(ARGV[1], ARGV[2])
 when "download", "dl"
   download(ARGV[1], ARGV[2])
 when "list", "ls"
