@@ -8,7 +8,7 @@ RSpec.configure do |config|
   end
 end
 
-if ENV["COVERAGE"]
+if ENV["COVERAGE"] || ENV["TRAVIS"]
   require "simplecov"
   lib = File.expand_path("../../lib", __FILE__)
   # track all ruby files under src
