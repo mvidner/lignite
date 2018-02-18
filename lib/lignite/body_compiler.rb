@@ -4,14 +4,14 @@ module Lignite
   # - high level flow control: {#loop}
   class BodyCompiler
 
-    # @locals are {Variables}
+    # {#locals} are {Variables}
     module VariableDeclarer
       def data32(id)
-        @locals.add(id, 4)
+        locals.add(id, 4)
       end
 
       def datas(id, size)
-        @locals.add(id, size)
+        locals.add(id, size)
       end
     end
 
