@@ -3,20 +3,17 @@ $: << "lib"
 
 require "lignite"
 
-conn = nil
-begin
-  conn = Lignite::UsbConnection.new
-rescue Lignite::NoUsbDevice
-  conn = Lignite::BluetoothConnection.new
-end
-dc = Lignite::DirectCommands.new(conn)
+dc = Lignite::DirectCommands.new
 
-sc = Lignite::SystemCommands.new(conn)
+sc = Lignite::SystemCommands.new
 len, h, list = sc.list_files(9999, "/home/root/lms2012/prjs/")
 p len
 p h
 print list
 
+dc.info_set_volume(50)
+dc.sound_tone(2, 880, 500)
+dc.info_set_volume(100)
 dc.sound_tone(2, 880, 500)
 
 dc.ui_draw_clean

@@ -1,7 +1,8 @@
 module Lignite
   # FIXME: cannot handle replies
   class DirectCommands
-    def initialize(conn)
+    # @param conn [Connection]
+    def initialize(conn = Connection.create)
       @op_compiler = OpCompiler.new
       @sender = MessageSender.new(conn)
     end

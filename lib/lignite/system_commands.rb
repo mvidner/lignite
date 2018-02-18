@@ -4,8 +4,8 @@ module Lignite
     include Logger
     extend Logger
 
-    # @param message_sender [MessageSender]
-    def initialize(conn)
+    # @param conn [Connection]
+    def initialize(conn = Connection.create)
       @message_sender = MessageSender.new(conn)
       load_yml
     end
