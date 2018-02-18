@@ -13,8 +13,9 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/mvidner/lignite"
   s.license     = "GPL-3.0"
 
-  #  puts `git ls-files`.lines.map { |f| "    %s,\n" % f.strip.inspect }
+  # ruby -e 'puts `git ls-files`.lines.map { |f| "    %s,\n" % f.strip.inspect }'
   s.files       = [
+    ".gitignore",
     "Rakefile",
     "VERSION",
     "bin/ev3tool",
@@ -36,15 +37,16 @@ Gem::Specification.new do |s|
     "lib/lignite/variables.rb",
     "lib/lignite/version.rb",
     "lignite.gemspec",
-    "test/data/HelloWorld-subop.rb",
-    "test/data/HelloWorld-subop.rbf",
-    "test/data/HelloWorld.lms",
-    "test/data/HelloWorld.rb",
-    "test/data/HelloWorld.rbf",
-    "test/data/VernierReadout.lms",
-    "test/data/VernierReadout.rb",
-    "test/data/VernierReadout.rbf",
-    "test/testme.rb",
+    "spec/assembler_spec.rb",
+    "spec/data/HelloWorld-subop.rb",
+    "spec/data/HelloWorld-subop.rbf",
+    "spec/data/HelloWorld.lms",
+    "spec/data/HelloWorld.rb",
+    "spec/data/HelloWorld.rbf",
+    "spec/data/VernierReadout.lms",
+    "spec/data/VernierReadout.rb",
+    "spec/data/VernierReadout.rbf",
+    "spec/spec_helper.rb",
     "try.rb"
   ]
 
@@ -52,6 +54,8 @@ Gem::Specification.new do |s|
 
   s.add_dependency "libusb", "~> 0.6"
 
+  s.add_development_dependency "coveralls", "~> 0"
+  s.add_development_dependency "simplecov", "~> 0"
   s.add_development_dependency "rspec", "~> 3"
   s.add_development_dependency "yard", "~> 0"
 end
