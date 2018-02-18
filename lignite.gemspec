@@ -64,6 +64,7 @@ TXT
 
   s.executables = s.files.grep(/^bin\//) { |f| File.basename(f) }
 
+  s.required_ruby_version = ">= 2.1" # mandatory keyword arguments
   s.add_dependency "libusb", "~> 0.6"
 
   s.add_development_dependency "coveralls", "~> 0"
