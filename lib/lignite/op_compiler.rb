@@ -89,7 +89,7 @@ module Lignite
         bytes
       end
     rescue TODO
-      logger.warn "Could not define #{oname}"
+      logger.debug "Could not define #{oname}"
     end
 
     @loaded = false
