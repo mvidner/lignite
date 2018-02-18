@@ -20,6 +20,9 @@ module Lignite
   PORT_C = 4
   PORT_D = 8
 
+  COAST = 0
+  BRAKE = 1
+
   # A String of bytes (with Encoding::BINARY)
   class ByteString < String
     # empty class, just for documentation purposes

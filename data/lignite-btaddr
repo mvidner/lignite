@@ -1,0 +1,7 @@
+# Default Bluetooth address for https://rubygems.org/gems/lignite
+
+# Put this file to ~/.config/lignite-btaddr
+# and edit the address to match your device.
+# You can use `hcitool scan` to find the address.
+
+00:11:22:DD:EE:FF

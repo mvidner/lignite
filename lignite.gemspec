@@ -6,7 +6,10 @@ Gem::Specification.new do |s|
   s.name        = "lignite"
   s.version     = Lignite::VERSION
   s.summary     = "Program LEGO Mindstorms EV3 in Ruby"
-  s.description = "Program LEGO Mindstorms EV3 in Ruby"
+  s.description = <<TXT
+Lignite is a set of Ruby tools to interact with LEGO Mindstorms EV3.
+It uses the original LMS2012 firmware, so ev3dev is not required.
+TXT
 
   s.author      = "Martin Vidner"
   s.email       = "martin@vidner.net"
@@ -18,11 +21,18 @@ Gem::Specification.new do |s|
     ".gitignore",
     "COPYING",
     "Gemfile",
+    "README.md",
     "Rakefile",
     "VERSION",
     "bin/ev3tool",
     "data/ev3.yml",
+    "data/lignite-btaddr",
     "data/sysops.yml",
+    "examples/hello.rb",
+    "examples/lights.rb",
+    "examples/motors.rb",
+    "examples/sound.rb",
+    "examples/sys_list_files.rb",
     "lib/lignite.rb",
     "lib/lignite/assembler.rb",
     "lib/lignite/body_compiler.rb",
@@ -49,8 +59,7 @@ Gem::Specification.new do |s|
     "spec/data/VernierReadout.lms",
     "spec/data/VernierReadout.rb",
     "spec/data/VernierReadout.rbf",
-    "spec/spec_helper.rb",
-    "try.rb"
+    "spec/spec_helper.rb"
   ]
 
   s.executables = s.files.grep(/^bin\//) { |f| File.basename(f) }
