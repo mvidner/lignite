@@ -29,7 +29,11 @@ Running the built-in demo program: Connect the brick with a USB cable. Run
 sudo ev3tool run ../prjs/BrkProg_SAVE/Demo.rpf
 ```
 
-(The `sudo` is needed to access the USB device.)
+> The `sudo` is needed to access the USB device.
+> With udev you can configure the system to allow access to all users like this:
+>
+>     echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0005", MODE="0666"' \
+>       | sudo tee /etc/udev/rules.d/99-org-rubygems-lignite-lego-ev3.rules
 
 To connect with Bluetooth, [configure the address](data/lignite-btaddr) and
 pair the device (FIXME: how; troubleshooting?)
