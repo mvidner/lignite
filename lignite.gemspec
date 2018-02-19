@@ -18,7 +18,9 @@ TXT
 
   # ruby -e 'puts `git ls-files`.lines.map { |f| "    %s,\n" % f.strip.inspect }'
   s.files       = [
+    ".coveralls.yml",
     ".gitignore",
+    ".travis.yml",
     "COPYING",
     "Gemfile",
     "README.md",
