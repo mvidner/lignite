@@ -19,9 +19,17 @@ module Lignite
         @sock.connect(sockaddr)
       end
 
+      def self.config_filename
+        "#{ENV['HOME']}/.config/lignite-btaddr"
+      end
+
+      def self.template_config_filename
+        # TODO: also find it from a gem
+        File.expand_path("../../../../data/lignite-btaddr", __FILE__)
+      end
+
       def address_from_file
-        fn = "#{ENV['HOME']}/.config/lignite-btaddr"
-        s = File.read(fn)
+        s = File.read(self.class.config_filename)
         s.lines.grep(/^[0-9a-fA-F]/).first.strip
       end
 
