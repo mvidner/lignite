@@ -9,6 +9,21 @@ documents at hand for reference: see the "Advanced Users – Developer Kits"
 section of the
 [Mindstorms Downloads](https://www.lego.com/en-us/mindstorms/downloads) page.
 
+[![Gem Version][GV img]][Gem Version]
+[![Build Status][BS img]][Build Status]
+[![Code Climate][CC img]][Code Climate]
+[![Coverage Status][CS img]][Coverage Status]
+
+[Gem Version]: https://rubygems.org/gems/lignite
+[Build Status]: https://travis-ci.org/mvidner/lignite
+[Code Climate]: https://codeclimate.com/github/mvidner/lignite
+[Coverage Status]: https://coveralls.io/r/mvidner/lignite
+
+[GV img]: https://badge.fury.io/rb/lignite.png
+[BS img]: https://travis-ci.org/mvidner/lignite.png
+[CC img]: https://codeclimate.com/github/mvidner/lignite.png
+[CS img]: https://coveralls.io/repos/mvidner/lignite/badge.png?branch=master
+
 ## Features
 
 - Connect via USB or Bluetooth
