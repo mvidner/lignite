@@ -33,6 +33,8 @@ module Lignite
       jr(Complex(- (subc.bytes.bytesize + 4), 2))
     end
 
+    # Delegate the ops to the {OpCompiler},
+    # but also aggregate the result in @bytes.
     def method_missing(name, *args)
       super unless @op_compiler.respond_to?(name)
 

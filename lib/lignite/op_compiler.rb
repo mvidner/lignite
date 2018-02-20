@@ -1,11 +1,21 @@
 require "yaml"
 
 module Lignite
+  # Dynamically constructs methods for all the instructions in ev3.yml
+  # The methods return the {ByteString}s corresponding to the ops.
   class OpCompiler
+    # TODO: doing it dynamically
+    # - is slow
+    # - makes the implementation harder to understand
+    # - means we cannot use YARD to document the API
+    # Therefore we should generate (most of) op_compiler.rb statically from
+    # ev3.yml ahead of the time.
+
     include Bytes
     include Logger
     extend Logger
 
+    # A marker for features that are not implemented yet
     class TODO < StandardError
     end
 
@@ -118,6 +128,8 @@ module Lignite
       @loaded = true
     end
 
+    # @param globals [Variables,nil]
+    # @param locals  [Variables,nil]
     def initialize(globals = nil, locals = nil)
       self.class.load_yml
       @globals = globals
@@ -190,6 +202,8 @@ module Lignite
        n & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, (n >> 24) & 0xff]
     end
 
+    # Reference a variable.
+    # (For declaring, see {VariableDeclarer}.)
     def make_var(sym)
       raise "No variables declared, cannot process symbols" if @locals.nil? && @globals.nil?
       if @locals.key?(sym)

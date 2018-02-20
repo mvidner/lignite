@@ -1,4 +1,5 @@
 module Lignite
+  # Assemble a complete RBF program file.
   class Assembler
     include Bytes
     include Logger
@@ -9,12 +10,20 @@ module Lignite
         u32(global_bytes)
     end
 
+    # @return [Array<RbfObject>]
+    attr :objects
+
+    # Assemble a complete RBF program file.
+    # (it is OK to reuse an Assembler and call this several times in a sequence)
+    # TODO: redesign for Assembler.new(rb_filename).assemble(rbf_filename)?
+    # @param rb_filename [String] input
+    # @param rbf_filename [String] output
     def assemble(rb_filename, rbf_filename)
       rb_text = File.read(rb_filename)
       @objects = []
       @global_bytes = 0
 
-      instance_eval(rb_text, rb_filename, 1)
+      instance_eval(rb_text, rb_filename, 1) # 1 is the line number
 
       File.open(rbf_filename, "w") do |f|
         dummy_header = image_header(image_size:0, version: 0, object_count: 0, global_bytes: 0)
@@ -40,6 +49,7 @@ module Lignite
       bodyc = BodyCompiler.new(@locals)
       bodyc.instance_exec(&body)
       bodyc.instance_exec { object_end }
+      # FIXME: id is not written?!
       logger.debug "VMTHREAD #{id}"
       logger.debug "  size #{bodyc.bytes.bytesize}"
       logger.debug "  " + hexdump(bodyc.bytes)

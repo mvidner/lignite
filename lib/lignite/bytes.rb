@@ -1,4 +1,5 @@
 module Lignite
+  # Shortcut methods to convert between data and their byte representation
   module Bytes
     def u8(n)
       (n & 0xff).chr
