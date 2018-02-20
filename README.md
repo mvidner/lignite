@@ -41,8 +41,12 @@ section of the
 Running the built-in demo program: Connect the brick with a USB cable. Run
 
 ```sh
-sudo ev3tool run ../prjs/BrkProg_SAVE/Demo.rpf
+sudo ev3tool run BrkProg_SAVE/Demo.rpf
 ```
+
+In the usual case where the folder and the program name are the same, a
+shortcut works: `ev3tool run everstorm` is like `ev3tool run
+everstorm/everstorm.rbf`.
 
 > The `sudo` is needed to access the USB device.
 > With udev you can configure the system to allow access to all users like this:
