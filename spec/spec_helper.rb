@@ -10,9 +10,10 @@ end
 
 if ENV["COVERAGE"] || ENV["TRAVIS"]
   require "simplecov"
-  lib = File.expand_path("../../lib", __FILE__)
-  # track all ruby files under src
-  SimpleCov.track_files("#{lib}/**/*.rb")
+  top = File.expand_path("../..", __FILE__)
+  # track all ruby files under lib
+  SimpleCov.track_files("#{top}/lib/**/*.rb")
+  SimpleCov.track_files("bin/ev3tool")
 
   # use coveralls for on-line code coverage reporting at Travis CI
   if ENV["TRAVIS"]
