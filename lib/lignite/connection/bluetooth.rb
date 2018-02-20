@@ -13,9 +13,13 @@ module Lignite
         channel = 1
         sockaddr = [AF_BLUETOOTH, 0, *addr_b.reverse, channel, 0].pack("C*")
         # common exceptions:
-        # "Errno::EHOSTUNREACH: No route to host": BT is disabled;
-        #   use `hciconfig hci0 up`
-        # "Errno::EHOSTDOWN: Host is down": Turn the brick on, enable BT
+        # "Errno::EHOSTUNREACH: No route to host":
+        #   - No BT adapter
+        #   - BT is disabled; use `hciconfig hci0 up`
+        # "Errno::EHOSTDOWN: Host is down":
+        #   - Turn the brick on
+        #   - enable BT on the brick
+        #   - disconnect other programming apps
         @sock.connect(sockaddr)
       end
 

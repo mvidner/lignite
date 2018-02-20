@@ -1,4 +1,6 @@
 module Lignite
+  class VMError < RuntimeError
+  end
 
   # FIXME: Possibly merge with Connection (UsbConnection)
   class MessageSender
@@ -26,7 +28,7 @@ module Lignite
       reply = Message.reply_from_bytes(receive)
       assert_match(reply.msgid, cmd.msgid, "Reply id")
       if reply.error?
-        raise "VMError"         # no details?
+        raise VMError # no details?
       end
 
       reply.data
@@ -40,7 +42,7 @@ module Lignite
       assert_match(reply.msgid, cmd.msgid, "Reply id")
       assert_match(reply.command, unpack_u8(instr_bytes[0]), "Command num")
       if reply.error?
-        raise "VMError, %u" % reply.status
+        raise VMError, "Error: %u" % reply.status
       end
 
       reply.data

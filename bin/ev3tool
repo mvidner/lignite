@@ -3,6 +3,11 @@ require "lignite"
 require "fileutils"
 include Lignite::Bytes
 
+# The VM current working directory is /home/root/lms2012/sys
+# which is not very useful. A better default is /home/root/lms2012/prjs
+# which is displayed on the 2nd tab of the brick UI.
+EV3TOOL_HOME = "../prjs"
+
 def phandles
   handles = $sc.list_open_handles
   puts "OPEN HANDLES: ", hexdump(handles)
@@ -12,7 +17,7 @@ def upload(local_filename, brick_filename = nil)
   data = File.read(local_filename, encoding: Encoding::BINARY)
   unless brick_filename
     prj = File.basename(local_filename, ".rbf")
-    brick_filename = "../prjs/#{prj}/#{prj}.rbf"
+    brick_filename = "#{EV3TOOL_HOME}/#{prj}/#{prj}.rbf"
   end
   handle = $sc.begin_download(data.bytesize, brick_filename)
   $sc.continue_download(handle, data)
@@ -32,7 +37,11 @@ def download(brick_filename, local_filename = nil)
 end
 
 def list_files(name)
-  name ||= "../prjs"
+  name ||= EV3TOOL_HOME
+  unless name.start_with?("/")
+    name = "#{EV3TOOL_HOME}/#{name}"
+  end
+
   result = ""
   fsize, handle, data = $sc.list_files(4096, name)
   loop do
@@ -42,9 +51,44 @@ def list_files(name)
     handle, data = $sc.continue_list_files(handle, 4096)
   end
   result
+rescue Lignite::VMError
+  nil
+end
+
+def ls(name)
+  raw = list_files(name)
+  return nil if raw.nil?
+
+  raw.lines.map do |l|
+    l = l.chomp
+    next nil if l == "./" || l == "../"
+    next l if l.end_with?("/")
+    # skip checksum + space + size + space
+    l[32 + 1 + 8 + 1 .. -1]
+  end.compact
+end
+
+def file_exist?(name)
+  dirname = File.dirname(name)
+  filename = File.basename(name)
+  files = ls(dirname) || []
+  files.include?(filename)
 end
 
 def run(name)
+  if name.include?("/")
+    unless name.start_with?("/")
+      name = "#{EV3TOOL_HOME}/#{name}"
+    end
+  else
+    name = "#{EV3TOOL_HOME}/#{name}/#{name}.rbf"
+  end
+
+  unless file_exist?(name)
+    $stderr.puts "File #{name.inspect} not found"
+    exit 1
+  end
+
   slot = Lignite::USER_SLOT
   no_debug = 0
   $dc.block do
@@ -54,6 +98,10 @@ def run(name)
     file_load_image(slot, name, :size, :ip)
     program_start(slot, :size, :ip, no_debug)
   end
+end
+
+def stop
+  $dc.program_stop(Lignite::USER_SLOT)
 end
 
 def assisted_connection
@@ -86,7 +134,11 @@ when "upload", "ul"
 when "download", "dl"
   download(ARGV[1], ARGV[2])
 when "list", "ls"
-  print list_files(ARGV[1])
+  puts ls(ARGV[1])
+when "ls-l"
+  puts list_files(ARGV[1])
 when "run"
   run(ARGV[1])
+when "stop"
+  stop
 end
