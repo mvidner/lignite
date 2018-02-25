@@ -11,6 +11,13 @@ module Lignite
     # @return [Lignite::DirectCommands]
     attr :dc
 
+    # 0x02 | 0x04 | 0x08 -> [1, 2, 3]
+    def nos_as_indices
+      [0, 1, 2, 3].find_all do |n|
+        (nos & (1 << n)) != 0
+      end
+    end
+
     def initialize(layer, nos, dc = Lignite::DirectCommands.new)
       @layer = layer
       @nos = nos
@@ -21,8 +28,15 @@ module Lignite
 
     # the type is an OUT param so the VM SETs and we GET to learn the type?
     def set_type
-      nos.map do |no|
-        dc.output_set_type(layer, no)
+      layer = @layer
+      nos_as_indices.map do |no|
+        type = dc.with_reply do
+          data8 :type
+          block do
+            output_set_type(layer, no, :type)
+          end
+        end
+        type
       end
     end
 
@@ -57,16 +71,29 @@ module Lignite
     end
 
     def read
-      nos.map do |no|
-        speed_tacho_pair = dc.output_read(layer, no)
+      layer = @layer
+      nos_as_indices.map do |no|
+        speed_tacho_pair = dc.with_reply do
+          data32 :tacho
+          data8 :speed
+          block do
+            output_read(layer, no, :speed, :tacho)
+          end
+        end
         speed_tacho_pair
       end
     end
 
     # ATTR running?
     def test
-      nos.map do |no|
-        busy = dc.output_test(layer, no)
+      layer = @layer
+      nos_as_indices.map do |no|
+        busy = dc.with_reply do
+          data8 :busy
+          block do
+            output_test(layer, no, :busy)
+          end
+        end
         busy
       end
     end
@@ -117,10 +144,17 @@ module Lignite
       dc.output_clr_count(layer, nos)
     end
 
-    # many motors, one out??
     def get_count
-      tachos = dc.output_get_count(layer, nos)
-      tachos
+      layer = @layer
+      nos_as_indices.map do |no|
+        tachos = dc.with_reply do
+          data32 :tachos
+          block do
+            output_get_count(layer, no, :tachos)
+          end
+        end
+        tachos
+      end
     end
 
     # WTF?

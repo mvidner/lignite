@@ -21,6 +21,11 @@ module Lignite
   PORT_C = 4
   PORT_D = 8
 
+  PORT_1 = 0
+  PORT_2 = 1
+  PORT_3 = 2
+  PORT_4 = 3
+
   COAST = 0
   BRAKE = 1
 

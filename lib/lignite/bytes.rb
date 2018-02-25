@@ -29,6 +29,10 @@ module Lignite
       s.unpack("L<").first
     end
 
+    def unpack_f32(s)
+      s.unpack("e").first
+    end
+
     def hexdump(s)
       s.unpack("H*").first
     end

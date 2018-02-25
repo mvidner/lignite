@@ -1,18 +1,37 @@
 module Lignite
-  # FIXME: cannot handle replies
   class DirectCommands
     # @param conn [Connection]
     def initialize(conn = Connection.create)
       @op_compiler = OpCompiler.new
       @sender = MessageSender.new(conn)
+      @globals = nil
+    end
+
+    def variables
+      @globals
+    end
+    include VariableDeclarer
+
+    def with_reply(&body)
+      @globals = Variables.new
+      ret_bytes = instance_exec(&body)
+      ret = @globals.unpack(ret_bytes)
+      @globals = nil
+      ret # TODO decode according to type
     end
 
     def block(&body)
-      globals = nil # TODO
       locals = Variables.new
-      bodyc = BodyCompiler.new(globals, locals)
+      bodyc = BodyCompiler.new(@globals, locals)
       bodyc.instance_exec(&body)
-      @sender.direct_command(bodyc.bytes, local_size: locals.bytesize)
+
+      bs = bodyc.bytes
+      lsize = locals.bytesize
+      if @globals
+        @sender.direct_command_with_reply(bs, global_size: @globals.bytesize, local_size: lsize)
+      else
+        @sender.direct_command(bs, global_size: 0, local_size: lsize)
+      end
     end
 
     def method_missing(name, *args)

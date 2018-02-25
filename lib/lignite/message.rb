@@ -85,7 +85,7 @@ module Lignite
   end
 
   class DirectReply < Message
-    def new(msgid:, error:, body:)
+    def initialize(msgid:, error:, body:)
       @msgid = msgid
       @error = error
       @globals = body

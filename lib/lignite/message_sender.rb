@@ -31,7 +31,7 @@ module Lignite
         raise VMError # no details?
       end
 
-      reply.data
+      reply.globals
     end
 
     def system_command_with_reply(instr_bytes)
