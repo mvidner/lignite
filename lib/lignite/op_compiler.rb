@@ -223,6 +223,7 @@ module Lignite
       when Integer
         make_lc(x).map(&:chr).join("")
       when Complex
+        # a Complex number: real: just like an Integer above, but imag tells how many bytes to use for it
         make_lc(x.real, x.imag).map(&:chr).join("")
       when String
         u8(0x80) + x + u8(0x00)

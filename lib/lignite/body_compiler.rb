@@ -3,34 +3,45 @@ module Lignite
   # - variable declarations: {VariableDeclarer}
   # - high level flow control: {#loop}
   class BodyCompiler
-
-    # {#locals} are {Variables}
-    module VariableDeclarer
-      def data32(id)
-        locals.add(id, 4)
-      end
-
-      def datas(id, size)
-        locals.add(id, size)
-      end
-    end
-
-    include VariableDeclarer
+    # @return [ByteString]
     attr_reader :bytes
+    # @return [Variables]
     attr_reader :locals
 
-    def initialize(locals)
+    def variables
+      locals
+    end
+    include VariableDeclarer
+
+    def initialize(globals, locals)
       @bytes = ""
+      @globals = globals
       @locals = locals
-      @op_compiler = OpCompiler.new(nil, @locals)
+      @op_compiler = OpCompiler.new(@globals, @locals)
+    end
+
+    def if(flag8, &body)
+      subc = BodyCompiler.new(@globals, @locals)
+      subc.instance_exec(&body)
+
+      jr_false(flag8, Complex(subc.bytes.bytesize, 2))
+      @bytes << subc.bytes
     end
 
     def loop(&body)
-      subc = BodyCompiler.new(@locals)
+      subc = BodyCompiler.new(@globals, @locals)
       subc.instance_exec(&body)
       @bytes << subc.bytes
       # the jump takes up 4 bytes: JR, LC2, LO, HI
       jr(Complex(- (subc.bytes.bytesize + 4), 2))
+    end
+
+    def loop_while_postcond(flag8, &body)
+      subc = BodyCompiler.new(@globals, @locals)
+      subc.instance_exec(&body)
+      @bytes << subc.bytes
+      # the jump takes up 4 bytes: JR_TRUE, LV0(flag8), LC2, LO, HI
+      jr_true(flag8, Complex(- (subc.bytes.bytesize + 5), 2))
     end
 
     # Delegate the ops to the {OpCompiler},

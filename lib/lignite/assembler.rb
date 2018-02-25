@@ -1,3 +1,5 @@
+require "lignite/variables"
+
 module Lignite
   # Assemble a complete RBF program file.
   class Assembler
@@ -12,16 +14,18 @@ module Lignite
 
     # @return [Array<RbfObject>]
     attr :objects
+    # @return [Variables]
+    attr :globals
 
     # Assemble a complete RBF program file.
     # (it is OK to reuse an Assembler and call this several times in a sequence)
     # TODO: redesign for Assembler.new(rb_filename).assemble(rbf_filename)?
     # @param rb_filename [String] input
     # @param rbf_filename [String] output
-    def assemble(rb_filename, rbf_filename)
+    def assemble(rb_filename, rbf_filename, version: 109)
       rb_text = File.read(rb_filename)
       @objects = []
-      @global_bytes = 0
+      @globals = Variables.new
 
       instance_eval(rb_text, rb_filename, 1) # 1 is the line number
 
@@ -37,16 +41,21 @@ module Lignite
         size = f.tell
         f.pos = 0
         header = image_header(image_size: size,
-                              version: 109,
+                              version: version,
                               object_count: @objects.size,
-                              global_bytes: @global_bytes)
+                              global_bytes: @globals.bytesize)
         f.write(header)
       end
     end
 
+    def variables
+      globals
+    end
+    include VariableDeclarer
+
     def vmthread(id, &body)
       @locals = Variables.new
-      bodyc = BodyCompiler.new(@locals)
+      bodyc = BodyCompiler.new(@globals, @locals)
       bodyc.instance_exec(&body)
       bodyc.instance_exec { object_end }
       # FIXME: id is not written?!

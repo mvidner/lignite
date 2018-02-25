@@ -8,8 +8,9 @@ module Lignite
     end
 
     def block(&body)
+      globals = nil # TODO
       locals = Variables.new
-      bodyc = BodyCompiler.new(locals)
+      bodyc = BodyCompiler.new(globals, locals)
       bodyc.instance_exec(&body)
       @sender.direct_command(bodyc.bytes, local_size: locals.bytesize)
     end

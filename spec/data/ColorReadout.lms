@@ -1,0 +1,75 @@
+define    PORT      1
+
+DATA16    Cmd
+DATA8     Type
+DATA8     Mode
+ARRAY8    Data 6
+
+vmthread  MAIN
+{
+  DATA32  Timer
+  DATA32  Data1
+  DATA32  Data2
+  DATA32  Data3
+  DATAS   String 8
+  DATA8   Mode
+  DATA8   State
+  
+
+  MOVE8_8(3,Mode)
+
+Loop:
+
+  UI_DRAW(FILLWINDOW,0x00,0,0)
+  UI_DRAW(SELECT_FONT,SMALL_FONT)
+  UI_DRAW(TEXT,FG_COLOR,0,10,' Color Readout  V0.00 ')
+  UI_DRAW(TEXT,FG_COLOR,0,30,'Mode ')
+
+  UI_DRAW(TEXT,FG_COLOR,0,50,'Raw 1')
+  UI_DRAW(TEXT,FG_COLOR,0,65,'Raw 2')
+  UI_DRAW(TEXT,FG_COLOR,0,80,'Raw 3')
+  UI_DRAW(TEXT,FG_COLOR,0,118,'Left = 3     Right = 4')
+  UI_DRAW(SELECT_FONT,NORMAL_FONT)
+  
+  MOVE8_32(Mode,Data1)
+  AND32(Data1,0xFF,Data1)
+  STRINGS(NUMBER_FORMATTED,Data1,'%1d',8,String)
+  UI_DRAW(TEXT,FG_COLOR,64,30,String)
+  
+  INPUT_DEVICE(READY_RAW,0,PORT,0,Mode,3,Data1,Data2,Data3)
+
+  AND32(Data1,0xFFFF,Data1)
+  STRINGS(NUMBER_FORMATTED,Data1,'%-5d',8,String)
+  UI_DRAW(TEXT,FG_COLOR,64,50,String)
+  
+  AND32(Data2,0xFFFF,Data2)
+  STRINGS(NUMBER_FORMATTED,Data2,'%-5d',8,String)
+  UI_DRAW(TEXT,FG_COLOR,64,65,String)
+  
+  AND32(Data3,0xFFFF,Data3)
+  STRINGS(NUMBER_FORMATTED,Data3,'%-5d',8,String)
+  UI_DRAW(TEXT,FG_COLOR,64,80,String)
+  
+  UI_DRAW(UPDATE)
+  
+  
+  UI_BUTTON(SHORTPRESS,LEFT_BUTTON,State)
+  JR_FALSE(State,Not3)
+  
+  MOVE8_8(3,Mode)
+  
+Not3:  
+
+  UI_BUTTON(SHORTPRESS,RIGHT_BUTTON,State)
+  JR_FALSE(State,Not4)
+  
+  MOVE8_8(4,Mode)
+  
+Not4:  
+
+  TIMER_WAIT(250,Timer)
+  TIMER_READY(Timer)
+
+	JR(Loop)
+}
+

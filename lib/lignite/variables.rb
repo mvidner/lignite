@@ -24,4 +24,31 @@ module Lignite
       @vars[sym][:offset]
     end
   end
+
+  # {#variables} are {Variables}
+  module VariableDeclarer
+    def data8(id)
+      variables.add(id, 1)
+    end
+
+    def data16(id)
+      variables.add(id, 2)
+    end
+
+    def data32(id)
+      variables.add(id, 4)
+    end
+
+    def dataf(id)
+      variables.add(id, 4)
+    end
+
+    def datas(id, size)
+      variables.add(id, size)
+    end
+
+    def array8(id, count)
+      variables.add(id, count * 1)
+    end
+  end
 end
