@@ -15,5 +15,5 @@ dc.output_step_speed(layer, nos, speed,
 dc.output_ready(layer, nos)
 
 speed = -100
-dc.output_step_speed(layer, nos, speed,
-                     step_begin, step_do, step_end, brake)
+m = Lignite::Motors.new(layer, nos, dc)
+m.step_speed(speed, step_begin, step_do, step_end)
