@@ -16,13 +16,15 @@ TXT
   s.homepage    = "https://github.com/mvidner/lignite"
   s.license     = "GPL-3.0-only"
 
-  # ruby -e 'puts `git ls-files`.lines.map { |f| "    %s,\n" % f.strip.inspect }'
+  # ruby -e 'puts `git ls-files`.lines.map { |f| "    %s" % f.strip.inspect }.join ",\n"'
   s.files       = [
     ".coveralls.yml",
     ".gitignore",
     ".travis.yml",
+    ".yardopts",
     "COPYING",
     "Gemfile",
+    "NEWS.md",
     "README.md",
     "Rakefile",
     "VERSION",
@@ -30,7 +32,9 @@ TXT
     "data/ev3.yml",
     "data/lignite-btaddr",
     "data/sysops.yml",
+    "examples/bobbee.rb",
     "examples/hello.rb",
+    "examples/light-sensor.rb",
     "examples/lights.rb",
     "examples/motors.rb",
     "examples/sound.rb",
@@ -46,6 +50,7 @@ TXT
     "lib/lignite/logger.rb",
     "lib/lignite/message.rb",
     "lib/lignite/message_sender.rb",
+    "lib/lignite/motors.rb",
     "lib/lignite/op_compiler.rb",
     "lib/lignite/rbf_object.rb",
     "lib/lignite/system_commands.rb",
@@ -53,11 +58,17 @@ TXT
     "lib/lignite/version.rb",
     "lignite.gemspec",
     "spec/assembler_spec.rb",
+    "spec/data/ColorReadout.lms",
+    "spec/data/ColorReadout.rb",
+    "spec/data/ColorReadout.rbf",
     "spec/data/HelloWorld-subop.rb",
     "spec/data/HelloWorld-subop.rbf",
     "spec/data/HelloWorld.lms",
     "spec/data/HelloWorld.rb",
     "spec/data/HelloWorld.rbf",
+    "spec/data/NoDebug.lms",
+    "spec/data/NoDebug.rb",
+    "spec/data/NoDebug.rbf",
     "spec/data/VernierReadout.lms",
     "spec/data/VernierReadout.rb",
     "spec/data/VernierReadout.rbf",
