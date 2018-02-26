@@ -5,10 +5,11 @@ require "lignite/assembler"
 require "lignite/body_compiler"
 require "lignite/connection"
 require "lignite/connection/bluetooth"
+require "lignite/connection/replay"
+require "lignite/connection/tap"
 require "lignite/connection/usb"
 require "lignite/direct_commands"
 require "lignite/message"
-require "lignite/message_sender"
 require "lignite/motors"
 require "lignite/op_compiler"
 require "lignite/rbf_object"
@@ -32,5 +33,8 @@ module Lignite
   # A String of bytes (with Encoding::BINARY)
   class ByteString < String
     # empty class, just for documentation purposes
+  end
+
+  class VMError < RuntimeError
   end
 end

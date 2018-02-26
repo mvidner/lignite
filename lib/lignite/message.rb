@@ -1,17 +1,20 @@
 module Lignite
   # A Message has 3 common parts:
   # - length u16, (not including the length itself);
-  #   this is added by {MessageSender#send}
-  #   and stripped by {MessageSender#receive}
+  #   this is added by {Connection#send}
+  #   and stripped by {Connection#receive}
   # - msgid, u16
   # - type, u8
   # and then a type-specific body.
-  # It is sent or received via {MessageSender}
   class Message
     include Bytes
     extend Bytes
     extend Logger
-    @msg_counter = rand(65535)
+
+    def self.reset_msgid
+      @msg_counter = 0
+    end
+    reset_msgid
 
     def self.msgid
       @msg_counter += 1

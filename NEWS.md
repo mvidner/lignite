@@ -2,7 +2,7 @@
 
 ## unreleased
 
-- (none)
+- Added Tap and Replay to simulate a real robot with YAML files for tests
 
 ## 0.2.0, 2018-02-26
 

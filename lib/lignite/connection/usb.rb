@@ -25,6 +25,7 @@ module Lignite
       attr_reader :device, :interface, :out_ep, :in_ep
 
       def initialize
+        super
         usb = LIBUSB::Context.new
         @device = usb.devices(idVendor: VENDOR_LEGO, idProduct: PRODUCT_EV3).first
         raise Lignite::NoUsbDevice if @device.nil?
@@ -68,6 +69,11 @@ module Lignite
         end
         logger.debug "Read returning #{got.bytesize} bytes"
         got
+      end
+
+      def close
+        super
+        # do nothing: read and write open and close the handle each time
       end
     end
   end

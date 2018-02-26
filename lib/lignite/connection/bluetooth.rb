@@ -8,6 +8,7 @@ module Lignite
 
       # @param address [String] "11:22:33:44:55:66"
       def initialize(address = address_from_file)
+        super()
         @sock = Socket.new(AF_BLUETOOTH, :STREAM, BTPROTO_RFCOMM)
         addr_b = address.split(/:/).map { |x| x.to_i(16) }
         channel = 1
@@ -43,6 +44,11 @@ module Lignite
 
       def write(s)
         @sock.write(s)
+      end
+
+      def close
+        @sock.shutdown
+        super
       end
     end
   end

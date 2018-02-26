@@ -17,3 +17,5 @@ pct = dc.with_reply do
   end
 end
 puts "Light sensor percentage: #{pct}"
+
+dc.close

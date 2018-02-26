@@ -41,7 +41,7 @@ module Lignite
     end
   end
 
-  # {#variables} are {Variables}
+  # `variables` are {Variables}
   module VariableDeclarer
     def data8(id)
       variables.add(id, 1, "C")

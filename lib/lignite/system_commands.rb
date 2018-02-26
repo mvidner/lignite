@@ -4,11 +4,23 @@ module Lignite
     include Logger
     extend Logger
 
+    def self.run(conn = Connection.create, &block)
+      sc = new(conn)
+      sc.instance_exec(&block)
+      sc.close
+    end
+
     # @param conn [Connection]
     def initialize(conn = Connection.create)
-      @message_sender = MessageSender.new(conn)
+      @conn = conn
       load_yml
     end
+
+    def close
+      @conn.close
+    end
+
+    private
 
     def load_yml
       fname = File.expand_path("../../../data/sysops.yml", __FILE__)
@@ -38,7 +50,7 @@ module Lignite
         end.join("")
         logger.debug "sysop to execute: #{bytes.inspect}"
 
-        reply = @message_sender.system_command_with_reply(bytes)
+        reply = system_command_with_reply(bytes)
 
         # TODO: parse it with return_handlers
         replies = return_handlers.map do |h|
@@ -99,5 +111,23 @@ module Lignite
       end
     end
 
+    def system_command_with_reply(instr_bytes)
+      cmd = Message.system_command_with_reply(instr_bytes)
+      @conn.send(cmd.bytes)
+
+      reply = Message.reply_from_bytes(@conn.receive)
+      assert_match(reply.msgid, cmd.msgid, "Reply id")
+      assert_match(reply.command, unpack_u8(instr_bytes[0]), "Command num")
+      if reply.error?
+        raise VMError, "Error: %u" % reply.status
+      end
+
+      reply.data
+    end
+
+    def assert_match(actual, expected, description)
+      return if actual == expected
+      raise "#{description} does not match, expected #{expected}, actual #{actual}"
+    end
   end
 end

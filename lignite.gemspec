@@ -20,6 +20,7 @@ TXT
   s.files       = [
     ".coveralls.yml",
     ".gitignore",
+    ".rspec",
     ".travis.yml",
     ".yardopts",
     "COPYING",
@@ -34,22 +35,27 @@ TXT
     "data/sysops.yml",
     "examples/bobbee.rb",
     "examples/hello.rb",
+    "examples/hello.yml",
     "examples/light-sensor.rb",
+    "examples/light-sensor.yml",
     "examples/lights.rb",
+    "examples/lights.yml",
     "examples/motors.rb",
     "examples/sound.rb",
     "examples/sys_list_files.rb",
+    "examples/sys_list_files.yml",
     "lib/lignite.rb",
     "lib/lignite/assembler.rb",
     "lib/lignite/body_compiler.rb",
     "lib/lignite/bytes.rb",
     "lib/lignite/connection.rb",
     "lib/lignite/connection/bluetooth.rb",
+    "lib/lignite/connection/replay.rb",
+    "lib/lignite/connection/tap.rb",
     "lib/lignite/connection/usb.rb",
     "lib/lignite/direct_commands.rb",
     "lib/lignite/logger.rb",
     "lib/lignite/message.rb",
-    "lib/lignite/message_sender.rb",
     "lib/lignite/motors.rb",
     "lib/lignite/op_compiler.rb",
     "lib/lignite/rbf_object.rb",
@@ -72,7 +78,9 @@ TXT
     "spec/data/VernierReadout.lms",
     "spec/data/VernierReadout.rb",
     "spec/data/VernierReadout.rbf",
-    "spec/spec_helper.rb"
+    "spec/direct_commands_spec.rb",
+    "spec/spec_helper.rb",
+    "spec/system_commands_spec.rb"
   ]
 
   s.executables = s.files.grep(/^bin\//) { |f| File.basename(f) }
