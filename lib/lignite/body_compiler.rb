@@ -51,5 +51,9 @@ module Lignite
 
       @bytes += @op_compiler.send(name, *args)
     end
+
+    def respond_to_missing?(name, _include_private)
+      @op_compiler.respond_to?(name) || super
+    end
   end
 end

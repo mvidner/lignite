@@ -59,11 +59,8 @@ module Lignite
             begin
               got = devh.interrupt_transfer(endpoint: @in_ep, dataIn: bytes)
             rescue LIBUSB::Error => e
-              if e.transferred.is_a? String
-                got = e.transferred
-              else
-                raise
-              end
+              got = e.transferred
+              raise unless got.is_a? String
             end
           end
         end

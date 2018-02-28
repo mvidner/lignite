@@ -55,6 +55,10 @@ module Lignite
       end
     end
 
+    def respond_to_missing?(name, _include_private)
+      @op_compiler.respond_to?(name) || super
+    end
+
     private
 
     def direct_command(instr_bytes, global_size: 0, local_size: 0)
@@ -82,6 +86,7 @@ module Lignite
     def var_alloc(global_size:, local_size:)
       var_alloc = global_size & 0x3ff
       var_alloc |= (local_size & 0x3f) << 10
+      var_alloc
     end
 
     def assert_match(actual, expected, description)

@@ -119,7 +119,7 @@ module Lignite
       end
 
       enums = yml["enums"]
-      enums.each do |_ename, edata|
+      enums.each_value do |edata|
         edata["members"].each do |mname, mdata|
           load_const(mname, mdata["value"])
         end
@@ -185,21 +185,22 @@ module Lignite
         2
       else
         4
-                end
+      end
       make_lcn(n, bytes)
     end
 
     def make_v(n, local_or_global)
       vartag = PRIMPAR_VARIABEL | local_or_global
       if (0..31).cover? n
-        return [vartag | (n & PRIMPAR_VALUE)]
+        [vartag | (n & PRIMPAR_VALUE)]
       elsif (0..255).cover? n
-        return [vartag | PRIMPAR_LONG | PRIMPAR_1_BYTE, n & 0xff]
+        [vartag | PRIMPAR_LONG | PRIMPAR_1_BYTE, n & 0xff]
       elsif (0..65535).cover? n
-        return [vartag | PRIMPAR_LONG | PRIMPAR_2_BYTES, n & 0xff, (n >> 8) & 0xff]
+        [vartag | PRIMPAR_LONG | PRIMPAR_2_BYTES, n & 0xff, (n >> 8) & 0xff]
+      else
+        [vartag | PRIMPAR_LONG | PRIMPAR_4_BYTES,
+         n & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, (n >> 24) & 0xff]
       end
-      [vartag | PRIMPAR_LONG | PRIMPAR_4_BYTES,
-       n & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, (n >> 24) & 0xff]
     end
 
     # Reference a variable.
