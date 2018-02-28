@@ -13,6 +13,7 @@ describe Lignite::DirectCommands do
     before(:each) { Lignite::Message.reset_msgid }
 
     it "correctly runs #{base}.rb" do
+      allow_any_instance_of(Lignite::DirectCommands).to receive(:sleep)
       ENV["LIGNITE_REPLAY"] = replay_yml
       expect { load(script) }.not_to raise_error
     end
