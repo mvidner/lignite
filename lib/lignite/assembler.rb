@@ -6,16 +6,16 @@ module Lignite
     include Bytes
     include Logger
 
-    SIGNATURE = "LEGO"
+    SIGNATURE = "LEGO".freeze
     def image_header(image_size:, version:, object_count:, global_bytes:)
       SIGNATURE + u32(image_size) + u16(version) + u16(object_count) +
         u32(global_bytes)
     end
 
     # @return [Array<RbfObject>]
-    attr :objects
+    attr_reader :objects
     # @return [Variables]
-    attr :globals
+    attr_reader :globals
 
     # Assemble a complete RBF program file.
     # (it is OK to reuse an Assembler and call this several times in a sequence)
@@ -30,7 +30,7 @@ module Lignite
       instance_eval(rb_text, rb_filename, 1) # 1 is the line number
 
       File.open(rbf_filename, "w") do |f|
-        dummy_header = image_header(image_size:0, version: 0, object_count: 0, global_bytes: 0)
+        dummy_header = image_header(image_size: 0, version: 0, object_count: 0, global_bytes: 0)
         f.write(dummy_header)
         @objects.each do |obj|
           h = obj.header(f.tell)
@@ -40,8 +40,8 @@ module Lignite
         end
         size = f.tell
         f.pos = 0
-        header = image_header(image_size: size,
-                              version: version,
+        header = image_header(image_size:   size,
+                              version:      version,
                               object_count: @objects.size,
                               global_bytes: @globals.bytesize)
         f.write(header)

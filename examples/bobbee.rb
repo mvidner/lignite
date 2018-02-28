@@ -1,5 +1,5 @@
 #!/usr/bin/ruby
-# coding: utf-8
+
 # https://www.lego.com/mindstorms/build-a-robot/bobb3e
 # A Bobcat® like two-tracked forklift
 
@@ -7,10 +7,10 @@ require "lignite"
 
 class Bobbee
   # @return [Lignite::Motors]
-  attr :drive
+  attr_reader :drive
   # @return [Lignite::Motors]
-  attr :lift
-  attr :dc
+  attr_reader :lift
+  attr_reader :dc
 
   def initialize(drive: Lignite::PORT_B | Lignite::PORT_C,
                  lift: Lignite::PORT_A,
@@ -49,7 +49,7 @@ class Bobbee
   end
 
   def third_raise(wait: true)
-    lift.step_power(30, 10, LIFT_FULL/3 - 20, 10)
+    lift.step_power(30, 10, LIFT_FULL / 3 - 20, 10)
     lift.ready if wait
 
     beep
@@ -57,7 +57,7 @@ class Bobbee
   end
 
   def lower(wait: true)
-    lift.step_power(-1, 10, LIFT_FULL - 20, 10) #, Lignite::COAST)
+    lift.step_power(-1, 10, LIFT_FULL - 20, 10) # , Lignite::COAST)
     lift.ready if wait
 
     beep
@@ -65,7 +65,7 @@ class Bobbee
   end
 
   def third_lower(wait: true)
-    lift.step_power(-1, 10, LIFT_FULL/3 - 20, 10)
+    lift.step_power(-1, 10, LIFT_FULL / 3 - 20, 10)
     lift.ready if wait
   end
 

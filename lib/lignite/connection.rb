@@ -5,9 +5,7 @@ module Lignite
 
     # @return [Connection] Try a {Usb} connection first, then a {Bluetooth} one.
     def self.create
-      if ENV["LIGNITE_REPLAY"]
-        @c ||= Replay.new(ENV["LIGNITE_REPLAY"])
-      end
+      @c ||= Replay.new(ENV["LIGNITE_REPLAY"]) if ENV["LIGNITE_REPLAY"]
 
       @c ||= begin
                Usb.new
@@ -15,9 +13,7 @@ module Lignite
                Bluetooth.new
              end
 
-      if ENV["LIGNITE_TAP"]
-        @c = Tap.new(@c, ENV["LIGNITE_TAP"])
-      end
+      @c = Tap.new(@c, ENV["LIGNITE_TAP"]) if ENV["LIGNITE_TAP"]
       @c
     end
 
@@ -60,14 +56,12 @@ module Lignite
     # @!method read(maxlen)
     # @!method write(data)
     # @!method close
-    
+
     private
 
     # read must not be called with a too low value :-/
     def bufread(n)
-      while n > @buf.bytesize
-        @buf += read(10000)
-      end
+      @buf += read(10000) while @buf.bytesize < n
       ret = @buf[0, n]
       @buf = @buf[n..-1]
       logger.debug "R<-(#{ret.bytesize})#{ret.inspect}"

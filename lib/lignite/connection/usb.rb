@@ -34,8 +34,8 @@ module Lignite
         ## device.set_configuration(CONFIGURATION_EV3)
         @interface = @device.interfaces[INTERFACE_EV3]
         eps = @interface.endpoints
-        @out_ep = eps.find { |e| e.direction == :out}
-        @in_ep = eps.find { |e| e.direction == :in}
+        @out_ep = eps.find { |e| e.direction == :out }
+        @in_ep = eps.find { |e| e.direction == :in }
       end
 
       # @return [Integer] number of bytes written

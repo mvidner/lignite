@@ -6,7 +6,7 @@ include Lignite::Bytes
 # The VM current working directory is /home/root/lms2012/sys
 # which is not very useful. A better default is /home/root/lms2012/prjs
 # which is displayed on the 2nd tab of the brick UI.
-EV3TOOL_HOME = "../prjs"
+EV3TOOL_HOME = "../prjs".freeze
 
 def phandles
   handles = $sc.list_open_handles
@@ -38,9 +38,7 @@ end
 
 def list_files(name)
   name ||= EV3TOOL_HOME
-  unless name.start_with?("/")
-    name = "#{EV3TOOL_HOME}/#{name}"
-  end
+  name = "#{EV3TOOL_HOME}/#{name}" unless name.start_with?("/")
 
   result = ""
   fsize, handle, data = $sc.list_files(4096, name)
@@ -64,7 +62,7 @@ def ls(name)
     next nil if l == "./" || l == "../"
     next l if l.end_with?("/")
     # skip checksum + space + size + space
-    l[32 + 1 + 8 + 1 .. -1]
+    l[32 + 1 + 8 + 1..-1]
   end.compact
 end
 
@@ -77,9 +75,7 @@ end
 
 def run(name)
   if name.include?("/")
-    unless name.start_with?("/")
-      name = "#{EV3TOOL_HOME}/#{name}"
-    end
+    name = "#{EV3TOOL_HOME}/#{name}" unless name.start_with?("/")
   else
     name = "#{EV3TOOL_HOME}/#{name}/#{name}.rbf"
   end

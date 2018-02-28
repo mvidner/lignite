@@ -118,9 +118,7 @@ module Lignite
       reply = Message.reply_from_bytes(@conn.receive)
       assert_match(reply.msgid, cmd.msgid, "Reply id")
       assert_match(reply.command, unpack_u8(instr_bytes[0]), "Command num")
-      if reply.error?
-        raise VMError, "Error: %u" % reply.status
-      end
+      raise VMError, format("Error: %u", reply.status) if reply.error?
 
       reply.data
     end

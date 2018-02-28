@@ -29,7 +29,7 @@ module Lignite
       ret_bytes = instance_exec(&body)
       ret = @globals.unpack(ret_bytes)
       @globals = nil
-      ret # TODO decode according to type
+      ret # TODO: decode according to type
     end
 
     def block(&body)
@@ -59,14 +59,14 @@ module Lignite
 
     def direct_command(instr_bytes, global_size: 0, local_size: 0)
       body = u16(var_alloc(global_size: global_size, local_size: local_size)) +
-             instr_bytes
+        instr_bytes
       cmd = Message.direct_command_no_reply(body)
       @conn.send(cmd.bytes)
     end
 
     def direct_command_with_reply(instr_bytes, global_size: 0, local_size: 0)
       body = u16(var_alloc(global_size: global_size, local_size: local_size)) +
-             instr_bytes
+        instr_bytes
       cmd = Message.direct_command_with_reply(body)
       @conn.send(cmd.bytes)
 

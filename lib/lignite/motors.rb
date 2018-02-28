@@ -6,10 +6,10 @@ module Lignite
     # do the DCs spawn independent threads??
     # must run ready in the same block?
 
-    attr :layer
-    attr :nos
+    attr_reader :layer
+    attr_reader :nos
     # @return [Lignite::DirectCommands]
-    attr :dc
+    attr_reader :dc
 
     # 0x02 | 0x04 | 0x08 -> [1, 2, 3]
     def nos_as_indices
@@ -24,7 +24,7 @@ module Lignite
       @dc = dc
     end
 
-    # TODO filter out support: official: no
+    # TODO: filter out support: official: no
 
     # the type is an OUT param so the VM SETs and we GET to learn the type?
     def set_type
@@ -62,7 +62,7 @@ module Lignite
     end
 
     def start
-      dc.output_start(layer, nos)   # apparently not
+      dc.output_start(layer, nos) # apparently not
     end
 
     # ATTR ~polarity

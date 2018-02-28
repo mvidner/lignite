@@ -119,7 +119,7 @@ module Lignite
       end
 
       enums = yml["enums"]
-      enums.each do |ename, edata|
+      enums.each do |_ename, edata|
         edata["members"].each do |mname, mdata|
           load_const(mname, mdata["value"])
         end
@@ -177,25 +177,25 @@ module Lignite
     end
 
     def make_lc(n, bytes = nil)
-      bytes ||= if (-31 .. 31).include? n
-                  0
-                elsif (-127 .. 127).include? n
-                  1
-                elsif (-32767 .. 32767).include? n
-                  2
-                else
-                  4
+      bytes ||= if (-31..31).cover? n
+        0
+      elsif (-127..127).cover? n
+        1
+      elsif (-32767..32767).cover? n
+        2
+      else
+        4
                 end
       make_lcn(n, bytes)
     end
 
     def make_v(n, local_or_global)
       vartag = PRIMPAR_VARIABEL | local_or_global
-      if (0 .. 31).include? n
+      if (0..31).cover? n
         return [vartag | (n & PRIMPAR_VALUE)]
-      elsif (0 .. 255).include? n
+      elsif (0..255).cover? n
         return [vartag | PRIMPAR_LONG | PRIMPAR_1_BYTE, n & 0xff]
-      elsif (0 .. 65535).include? n
+      elsif (0..65535).cover? n
         return [vartag | PRIMPAR_LONG | PRIMPAR_2_BYTES, n & 0xff, (n >> 8) & 0xff]
       end
       [vartag | PRIMPAR_LONG | PRIMPAR_4_BYTES,

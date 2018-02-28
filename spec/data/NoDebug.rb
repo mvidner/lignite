@@ -1,4 +1,4 @@
-appv = 'NoDebug V1.02'
+appv = "NoDebug V1.02"
 
 vmthread :MAIN do
   data8 :ShowVersion

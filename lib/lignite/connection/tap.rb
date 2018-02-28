@@ -36,7 +36,7 @@ module Lignite
       private
 
       # @param bin [ByteString] "A42"
-      # @return [String] "413432"      
+      # @return [String] "413432"
       def bin_to_hex(bin)
         bin.unpack("H*").first
       end

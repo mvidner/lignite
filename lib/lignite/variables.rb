@@ -14,7 +14,7 @@ module Lignite
     # declare
     def add(id, size, unpacker)
       raise "Duplicate variable #{id}" if @vars.key?(id)
-      @vars[id] = {offset: @offset, size: size}
+      @vars[id] = { offset: @offset, size: size }
       @offset += size
       @unpacker += unpacker
     end

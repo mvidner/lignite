@@ -25,7 +25,7 @@ module Lignite
       end
 
       def self.config_filename
-        "#{ENV['HOME']}/.config/lignite-btaddr"
+        "#{ENV["HOME"]}/.config/lignite-btaddr"
       end
 
       def self.template_config_filename

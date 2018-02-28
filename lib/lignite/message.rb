@@ -66,7 +66,7 @@ module Lignite
       when 0x04               # DIRECT_REPLY_ERROR
         DirectReply.new(msgid: msgid, error: true, body: body)
       else
-        raise "Unexpected reply type %x" % type
+        raise format("Unexpected reply type %x", type)
       end
     end
   end

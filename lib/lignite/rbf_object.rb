@@ -18,7 +18,7 @@ module Lignite
     end
 
     # @return [ByteString] an already assembled body of the object
-    attr :body
+    attr_reader :body
 
     def initialize(owner:, triggers:, local_bytes:, body:)
       @owner = owner
