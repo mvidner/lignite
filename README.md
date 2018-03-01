@@ -41,11 +41,11 @@ section of the
 Running the built-in demo program: Connect the brick with a USB cable. Run
 
 ```sh
-sudo ev3tool run BrkProg_SAVE/Demo.rpf
+sudo ev3tool start BrkProg_SAVE/Demo.rpf
 ```
 
 In the usual case where the folder and the program name are the same, a
-shortcut works: `ev3tool run everstorm` is like `ev3tool run
+shortcut works: `ev3tool start everstorm` is like `ev3tool start
 everstorm/everstorm.rbf`.
 
 > The `sudo` is needed to access the USB device.

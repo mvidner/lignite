@@ -85,6 +85,7 @@ TXT
 
   s.required_ruby_version = ">= 2.1" # mandatory keyword arguments
   s.add_dependency "libusb", "~> 0.6"
+  s.add_dependency "thor", "~> 0.19"
 
   s.add_development_dependency "coveralls", "~> 0"
   s.add_development_dependency "simplecov", "~> 0"

@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require "lignite"
+require "thor"
 require "fileutils"
 include Lignite::Bytes
 
@@ -9,132 +10,142 @@ include Lignite::Bytes
 EV3TOOL_HOME = "../prjs".freeze
 
 def phandles
-  handles = $sc.list_open_handles
+  handles = sc.list_open_handles
   puts "OPEN HANDLES: ", hexdump(handles)
 end
 
-def upload(local_filename, brick_filename = nil)
-  data = File.read(local_filename, encoding: Encoding::BINARY)
-  unless brick_filename
-    prj = File.basename(local_filename, ".rbf")
-    brick_filename = "#{EV3TOOL_HOME}/#{prj}/#{prj}.rbf"
+class Ev3Tool < Thor
+  desc "upload LOCAL_FILENAME [BRICK_FILENAME]", "upload a program or a file"
+  map "ul" => "upload"
+  def upload(local_filename, brick_filename = nil)
+    data = File.read(local_filename, encoding: Encoding::BINARY)
+    unless brick_filename
+      prj = File.basename(local_filename, ".rbf")
+      brick_filename = "#{EV3TOOL_HOME}/#{prj}/#{prj}.rbf"
+    end
+    handle = sc.begin_download(data.bytesize, brick_filename)
+    sc.continue_download(handle, data)
   end
-  handle = $sc.begin_download(data.bytesize, brick_filename)
-  $sc.continue_download(handle, data)
-end
 
-def download(brick_filename, local_filename = nil)
-  local_filename ||= File.basename(brick_filename)
-  fsize, handle, data = $sc.begin_upload(4096, brick_filename)
-  File.open(local_filename, "w") do |f|
-    loop do
-      f.write(data)
-      fsize -= data.bytesize
-      break if fsize.zero?
-      handle, data = $sc.continue_upload(handle, 4096)
+  desc "download BRICK_FILENAME [LOCAL_FILENAME]", "download a file"
+  map "dl" => "download"
+  def download(brick_filename, local_filename = nil)
+    local_filename ||= File.basename(brick_filename)
+    fsize, handle, data = sc.begin_upload(4096, brick_filename)
+    File.open(local_filename, "w") do |f|
+      loop do
+        f.write(data)
+        fsize -= data.bytesize
+        break if fsize.zero?
+        handle, data = sc.continue_upload(handle, 4096)
+      end
     end
   end
-end
 
-def list_files(name)
-  name ||= EV3TOOL_HOME
-  name = "#{EV3TOOL_HOME}/#{name}" unless name.start_with?("/")
-
-  result = ""
-  fsize, handle, data = $sc.list_files(4096, name)
-  loop do
-    result += data
-    fsize -= data.bytesize
-    break if fsize.zero?
-    handle, data = $sc.continue_list_files(handle, 4096)
-  end
-  result
-rescue Lignite::VMError
-  nil
-end
-
-def ls(name)
-  raw = list_files(name)
-  return nil if raw.nil?
-
-  raw.lines.map do |l|
-    l = l.chomp
-    next nil if l == "./" || l == "../"
-    next l if l.end_with?("/")
-    # skip checksum + space + size + space
-    l[32 + 1 + 8 + 1..-1]
-  end.compact
-end
-
-def file_exist?(name)
-  dirname = File.dirname(name)
-  filename = File.basename(name)
-  files = ls(dirname) || []
-  files.include?(filename)
-end
-
-def run(name)
-  if name.include?("/")
+  desc "list-files DIRNAME", "list DIRNAME in a long format"
+  map "ls-l" => "list-files"
+  def list_files(name)
+    name ||= EV3TOOL_HOME
     name = "#{EV3TOOL_HOME}/#{name}" unless name.start_with?("/")
-  else
-    name = "#{EV3TOOL_HOME}/#{name}/#{name}.rbf"
+
+    result = ""
+    fsize, handle, data = sc.list_files(4096, name)
+    loop do
+      result += data
+      fsize -= data.bytesize
+      break if fsize.zero?
+      handle, data = sc.continue_list_files(handle, 4096)
+    end
+    result
+  rescue Lignite::VMError
+    nil
   end
 
-  unless file_exist?(name)
-    $stderr.puts "File #{name.inspect} not found"
-    exit 1
+  desc "ls DIRNAME", "list DIRNAME in a short format"
+  def ls(name)
+    raw = list_files(name)
+    return nil if raw.nil?
+
+    raw.lines.map do |l|
+      l = l.chomp
+      next nil if ["./", "../"].include?(l)
+      next l if l.end_with?("/")
+      # skip checksum + space + size + space
+      l[32 + 1 + 8 + 1..-1]
+    end.compact
   end
 
-  slot = Lignite::USER_SLOT
-  no_debug = 0
-  $dc.block do
-    # these are local variables
-    data32 :size
-    data32 :ip
-    file_load_image(slot, name, :size, :ip)
-    program_start(slot, :size, :ip, no_debug)
+  desc "start NAME", "start a program"
+  def start(name)
+    if name.include?("/")
+      name = "#{EV3TOOL_HOME}/#{name}" unless name.start_with?("/")
+    else
+      name = "#{EV3TOOL_HOME}/#{name}/#{name}.rbf"
+    end
+
+    unless file_exist?(name)
+      $stderr.puts "File #{name.inspect} not found"
+      exit 1
+    end
+
+    slot = Lignite::USER_SLOT
+    no_debug = 0
+    dc.block do
+      # these are local variables
+      data32 :size
+      data32 :ip
+      file_load_image(slot, name, :size, :ip)
+      program_start(slot, :size, :ip, no_debug)
+    end
   end
-end
 
-def stop
-  $dc.program_stop(Lignite::USER_SLOT)
-end
+  desc "stop", "stop a running program"
+  def stop
+    dc.program_stop(Lignite::USER_SLOT)
+  end
 
-def assisted_connection
-  Lignite::Connection.create
-rescue => e
-  fn = Lignite::Connection::Bluetooth.config_filename
-  $stderr.puts <<MSG
+  no_commands do
+    def file_exist?(name)
+      dirname = File.dirname(name)
+      filename = File.basename(name)
+      files = ls(dirname) || []
+      files.include?(filename)
+    end
+
+    def assisted_connection
+      Lignite::Connection.create
+    rescue => e
+      fn = Lignite::Connection::Bluetooth.config_filename
+      $stderr.puts <<MSG
 Could not connect to EV3.
 Use a USB cable or configure a Bluetooth address in #{fn.inspect}.
 Details:
   #{e.message}
 MSG
 
-  template = Lignite::Connection::Bluetooth.template_config_filename
-  if !File.exist?(fn) && File.exist?(template)
-    FileUtils.mkdir_p(File.dirname(fn))
-    FileUtils.install(template, fn)
-    $stderr.puts "(A template config file has been copied for your convenience)"
+      template = Lignite::Connection::Bluetooth.template_config_filename
+      if !File.exist?(fn) && File.exist?(template)
+        FileUtils.mkdir_p(File.dirname(fn))
+        FileUtils.install(template, fn)
+        $stderr.puts "(A template config file has been copied for your convenience)"
+      end
+      exit 1
+    end
+
+    def sc
+      return @sc if @sc
+      @sc = Lignite::SystemCommands.new(conn)
+    end
+
+    def dc
+      return @dc if @dc
+      @dc = Lignite::DirectCommands.new(conn)
+    end
+
+    def conn
+      @conn ||= assisted_connection
+    end
   end
-  exit 1
 end
 
-conn = assisted_connection
-$sc = Lignite::SystemCommands.new(conn)
-$dc = Lignite::DirectCommands.new(conn)
-
-case ARGV[0]
-when "upload", "ul"
-  upload(ARGV[1], ARGV[2])
-when "download", "dl"
-  download(ARGV[1], ARGV[2])
-when "list", "ls"
-  puts ls(ARGV[1])
-when "ls-l"
-  puts list_files(ARGV[1])
-when "run"
-  run(ARGV[1])
-when "stop"
-  stop
-end
+Ev3Tool.start(ARGV)
