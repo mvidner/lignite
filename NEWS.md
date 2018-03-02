@@ -2,7 +2,10 @@
 
 ## unreleased
 
+## 0.3.0, 2018-03-02
+
 - Added Tap and Replay to simulate a real robot with YAML files for tests
+- `ev3tool help` added
 - `ev3tool run` changed to `ev3tool start` (because Thor reserves `run`)
 
 ## 0.2.0, 2018-02-26
