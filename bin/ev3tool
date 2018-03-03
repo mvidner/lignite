@@ -2,6 +2,7 @@
 require "lignite"
 require "thor"
 require "fileutils"
+require "objspace"
 
 # The VM current working directory is /home/root/lms2012/sys
 # which is not very useful. A better default is /home/root/lms2012/prjs
@@ -124,7 +125,9 @@ class Ev3Tool < Thor
     end
 
     def assisted_connection
-      Lignite::Connection.create
+      c = Lignite::Connection.create
+      ObjectSpace.define_finalizer(c, ->(_id) { c.close })
+      c
     rescue StandardError => e
       fn = Lignite::Connection::Bluetooth.config_filename
       $stderr.puts <<MSG
