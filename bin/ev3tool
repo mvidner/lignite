@@ -2,7 +2,6 @@
 require "lignite"
 require "thor"
 require "fileutils"
-require "unindent"
 
 # The VM current working directory is /home/root/lms2012/sys
 # which is not very useful. A better default is /home/root/lms2012/prjs
@@ -128,11 +127,11 @@ class Ev3Tool < Thor
       Lignite::Connection.create
     rescue StandardError => e
       fn = Lignite::Connection::Bluetooth.config_filename
-      $stderr.puts <<MSG.unindent
-        Could not connect to EV3.
-        Use a USB cable or configure a Bluetooth address in #{fn.inspect}.
-        Details:
-          #{e.message}
+      $stderr.puts <<MSG
+Could not connect to EV3.
+Use a USB cable or configure a Bluetooth address in #{fn.inspect}.
+Details:
+  #{e.message}
 MSG
 
       try_config_from_template(fn, Lignite::Connection::Bluetooth.template_config_filename)

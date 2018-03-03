@@ -95,11 +95,11 @@ TXT
   s.required_ruby_version = ">= 2.1" # mandatory keyword arguments
   s.add_dependency "libusb", "~> 0.6"
   s.add_dependency "thor", "~> 0.19"
-  s.add_dependency "unindent", "1.0"
 
   s.add_development_dependency "coveralls", "~> 0"
   s.add_development_dependency "rake", ">= 0", "< 99"
   s.add_development_dependency "rspec", "~> 3"
+  s.add_development_dependency "rubocop", "0.50.0"
   s.add_development_dependency "simplecov", "~> 0"
   s.add_development_dependency "yard", "~> 0"
 end

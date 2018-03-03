@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
 require "yaml"
 require "erb"
-require "unindent"
 
 class TODO < RuntimeError
 end
@@ -14,19 +13,25 @@ end
 def rendered_file(yml_hash)
   op_hash = yml_hash["ops"]
 
-  main_template = ERB.new(<<RUBY.unindent, nil, "<>-")
-    # This file is generated from ev3.yml. DO NOT EDIT.
+  result = <<RUBY
+# This file is generated from ev3.yml. DO NOT EDIT.
 
-    module Lignite
-      # Bytecodes implemented by EV3
-      module Ev3Ops
-    <% op_hash.each do |oname, odata| -%>
-    <%=   rendered_op2(oname, odata) %>
-    <% end -%>
-      end
-    end
+module Lignite
+  # Bytecodes implemented by EV3
+  module Ev3Ops
+#{rendered_ops(op_hash).chomp}
+  end
+end
 RUBY
-  main_template.result(binding)
+  result
+end
+
+# @return [String] Ruby code
+def rendered_ops(op_hash)
+  ss = op_hash.map do |oname, odata|
+    rendered_op2(oname, odata)
+  end
+  ss.join "\n"
 end
 
 # @param oname [String] "PROGRAM_STOP"
@@ -43,12 +48,12 @@ def rendered_op2(oname, odata)
       cvalue = cdata["value"]
       s << load_const(cname, cvalue, cdesc)
       cparams = cdata["params"]
-      s << rendered_op4("#{oname}_#{cname}", cdesc, ovalue, cvalue, cparams)
+      s << rendered_op4("#{oname}_#{cname}".downcase, cdesc, ovalue, cvalue, cparams)
     end
     s << rendered_multiop(oname, commands)
     s
   else
-    rendered_op4(oname, odata["desc"], ovalue, nil, oparams)
+    rendered_op4(oname.downcase, odata["desc"], ovalue, nil, oparams)
   end
 end
 
@@ -63,12 +68,9 @@ def rendered_multiop(oname, commands)
   osym = oname.downcase.to_sym
 
   multiplex_values = names.map do |cvalue, csym|
-    <<RUBY
-      #{cvalue} => #{csym.inspect},
-RUBY
+    "      #{cvalue} => #{csym.inspect},\n"
   end
 
-  # rubocop:disable Layout/IndentHeredoc, we do want the precise indentation
   result = <<RUBY
 
     MULTIPLEX_#{oname} = {
@@ -82,27 +84,39 @@ RUBY
       __send__("#{osym}_\#{csym}", *args)
     end
 RUBY
-  # rubocop:enable Layout/IndentHeredoc
   result
 end
 
-# @param oname [String] "MOVE32_32"
+def param_handler(par)
+  par_type = par["type"]
+  case par_type
+  when "PAR8", "PAR16", "PAR32", "PARF"
+    :param_simple
+  when "PARNO"
+    :param_multiple
+  else
+    raise TODO, "Unhandled param type #{par_type}"
+  end
+end
+
+# @return [String] Ruby code
+def method_docs(odesc, params)
+  ss = params.map do |p|
+    n = p["name"].downcase
+    t = p["type"]
+    "    # @param #{n} [#{t}] (#{p["dir"]}) #{p["desc"]}\n"
+  end
+  "    # #{odesc.to_s.chomp}\n" + ss.join("")
+end
+
+# @param oname [String] "move32_32"
 # @param ovalue [Integer] 0x3A
 # @param cvalue [Integer,nil]
 # @return [String] Ruby code
-def rendered_op4(oname, odesc, ovalue, cvalue, params)
+def rendered_op4(oname, odesc, ovalue, cvalue, params) # rubocop:disable Metrics/MethodLength
   s = ""
 
-  param_handlers = params.map do |par|
-    case par["type"]
-    when "PAR8", "PAR16", "PAR32", "PARF"
-      :param_simple
-    when "PARNO"
-      :param_multiple
-    else
-      raise TODO, "Unhandled param type #{par["type"]}"
-    end
-  end
+  param_handlers = params.map { |par| param_handler(par) }
 
   param_names = params.map do |par|
     (par["type"] == "PARNO" ? "*" : "") + par["name"].downcase
@@ -110,20 +124,12 @@ def rendered_op4(oname, odesc, ovalue, cvalue, params)
   param_decl = param_names.join ", "
   param_decl = "(#{param_decl})" unless param_decl.empty?
 
-  osym = oname.downcase.to_sym
+  s << method_docs(odesc, params)
   s << <<RUBY
-    # #{odesc.to_s.chomp}
-RUBY
-  params.each do |p|
-    n = p["name"].downcase
-    t = p["type"]
-    s << "    # @param #{n} [#{t}] (#{p["dir"]}) #{p["desc"]}\n"
-  end
-  s << <<RUBY
-    def #{osym}#{param_decl}
+    def #{oname}#{param_decl}
       logger.debug do
         args = [#{param_names.join ", "}]
-        "called #{osym} with \#{args.inspect}"
+        "called #{oname} with \#{args.inspect}"
       end
 
       bytes = u8(#{format("0x%02X", ovalue)})

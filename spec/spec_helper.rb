@@ -14,6 +14,8 @@ if ENV["COVERAGE"] || ENV["TRAVIS"]
   # track all ruby files under lib
   SimpleCov.track_files("#{top}/lib/**/*.rb")
   SimpleCov.track_files("bin/ev3tool")
+  # filter out the huge generated file
+  SimpleCov.add_filter("ev3_ops.rb")
 
   # use coveralls for on-line code coverage reporting at Travis CI
   if ENV["TRAVIS"]

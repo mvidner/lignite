@@ -12,21 +12,29 @@ Naming/FileName:
     - spec/data/*.rb
 
 Layout/IndentHeredoc:
-  EnforcedStyle: unindent
-  Exclude:
-    - lignite.gemspec
+  Enabled: false
 
 Performance/RedundantBlockCall:
+  Enabled: false
+
+Style/SymbolArray:
   Enabled: false
 
 Metrics/BlockLength:
   Exclude:
     - lignite.gemspec
+    - bin/ev3tool
     - spec/**/*.rb
 
 Metrics/ClassLength:
   Exclude:
+    - bin/ev3tool
     - lib/lignite/motors.rb
 
 Metrics/MethodLength:
-  Max: 20
+  Max: 25
+
+Metrics/ModuleLength:
+  Exclude:
+    # generated
+    - lib/lignite/enums.rb

@@ -1,8 +1,18 @@
-task default: :test
+task default: [:test, :rubocop, :yard]
 
 desc "Run tests"
 task :test do
   system "rspec"
+end
+
+desc "Run RuboCop"
+task :rubocop do
+  system "rubocop --display-cop-names"
+end
+
+desc "Generate YARD documentation"
+task :yard do
+  system "yardoc --use-cache"
 end
 
 EV3_YML = "data/ev3.yml".freeze

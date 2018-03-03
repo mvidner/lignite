@@ -54,15 +54,21 @@ module Lignite
 
         reply = system_command_with_reply(bytes)
 
-        # TODO: parse it with return_handlers
-        replies = return_handlers.map do |h|
-          parsed, reply = h.call(reply)
-          parsed
-        end
-        raise "Unparsed reply #{reply.inspect}" unless reply.empty?
-        # A single reply is returned as a scalar, not an array
-        replies.size == 1 ? replies.first : replies
+        parse_reply(reply, return_handlers)
       end
+    end
+
+    # @param reply [ByteString]
+    # @param return_handlers [Array<Proc>]
+    # @return [Object,Array<Object>]
+    def parse_reply(reply, return_handlers)
+      replies = return_handlers.map do |h|
+        parsed, reply = h.call(reply)
+        parsed
+      end
+      raise "Unparsed reply #{reply.inspect}" unless reply.empty?
+      # A single reply is returned as a scalar, not an array
+      replies.size == 1 ? replies.first : replies
     end
 
     def handlers(odata)
@@ -81,16 +87,11 @@ module Lignite
 
     def param_handler(oparam)
       case oparam["type"]
-      when "U8"
-        ->(x) { u8(x) }
-      when "U16"
-        ->(x) { u16(x) }
-      when "U32"
-        ->(x) { u32(x) }
-      when "BYTES"
-        ->(x) { x }
-      when "ZBYTES"
-        ->(x) { x + u8(0) }
+      when "U8" then ->(x) { u8(x) }
+      when "U16" then ->(x) { u16(x) }
+      when "U32" then ->(x) { u32(x) }
+      when "BYTES" then ->(x) { x }
+      when "ZBYTES" then ->(x) { x + u8(0) }
       else
         raise
       end
@@ -100,14 +101,10 @@ module Lignite
     # a parsed value and the rest of the input
     def return_handler(oparam)
       case oparam["type"]
-      when "U8"
-        ->(i) { [unpack_u8(i[0, 1]), i[1..-1]] }
-      when "U16"
-        ->(i) { [unpack_u16(i[0, 2]), i[2..-1]] }
-      when "U32"
-        ->(i) { [unpack_u32(i[0, 4]), i[4..-1]] }
-      when "BYTES"
-        ->(i) { [i, ""] }
+      when "U8" then ->(i) { [unpack_u8(i[0, 1]), i[1..-1]] }
+      when "U16" then ->(i) { [unpack_u16(i[0, 2]), i[2..-1]] }
+      when "U32" then ->(i) { [unpack_u32(i[0, 4]), i[4..-1]] }
+      when "BYTES" then ->(i) { [i, ""] }
       else
         raise
       end

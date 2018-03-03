@@ -318,7 +318,7 @@ module Lignite
       __send__("program_info_#{csym}", *args)
     end
 
-    # Could not define LABEL: Unhandled param type PARLAB
+    # Could not define label: Unhandled param type PARLAB
 
     # Display globals or object locals on terminal
     # @param prgid [PAR16] (in) Program slot number
@@ -862,7 +862,7 @@ module Lignite
       bytes
     end
 
-    # Could not define INIT_BYTES: Unhandled param type PARVALUES
+    # Could not define init_bytes: Unhandled param type PARVALUES
 
     # Move 8 bit value from SOURCE to DESTINATION
     # @param source [PAR8] (in)
@@ -5441,11 +5441,11 @@ module Lignite
     #
     Lignite::PLAY = 2
 
-    # Could not define SOUND_PLAY: Unhandled param type PARS
+    # Could not define sound_play: Unhandled param type PARS
     #
     Lignite::REPEAT = 3
 
-    # Could not define SOUND_REPEAT: Unhandled param type PARS
+    # Could not define sound_repeat: Unhandled param type PARS
     #
     Lignite::SERVICE = 4
 
@@ -7521,7 +7521,7 @@ module Lignite
     #
     Lignite::FILL = 6
 
-    # Could not define ARRAY_FILL: Unhandled param type PARV
+    # Could not define array_fill: Unhandled param type PARV
     #
     Lignite::COPY = 7
 
@@ -7544,19 +7544,19 @@ module Lignite
     #
     Lignite::INIT8 = 8
 
-    # Could not define ARRAY_INIT8: Unhandled param type PARVALUES
+    # Could not define array_init8: Unhandled param type PARVALUES
     #
     Lignite::INIT16 = 9
 
-    # Could not define ARRAY_INIT16: Unhandled param type PARVALUES
+    # Could not define array_init16: Unhandled param type PARVALUES
     #
     Lignite::INIT32 = 10
 
-    # Could not define ARRAY_INIT32: Unhandled param type PARVALUES
+    # Could not define array_init32: Unhandled param type PARVALUES
     #
     Lignite::INITF = 11
 
-    # Could not define ARRAY_INITF: Unhandled param type PARVALUES
+    # Could not define array_initf: Unhandled param type PARVALUES
     #
     Lignite::SIZE = 12
 
@@ -7693,11 +7693,11 @@ module Lignite
       __send__("array_#{csym}", *args)
     end
 
-    # Could not define ARRAY_WRITE: Unhandled param type PARV
+    # Could not define array_write: Unhandled param type PARV
 
-    # Could not define ARRAY_READ: Unhandled param type PARV
+    # Could not define array_read: Unhandled param type PARV
 
-    # Could not define ARRAY_APPEND: Unhandled param type PARV
+    # Could not define array_append: Unhandled param type PARV
 
     # Get memory usage
     # @param total [PAR32] (out) Total memory [KB]
@@ -9092,25 +9092,25 @@ module Lignite
       bytes
     end
 
-    # Could not define DYNLOAD_ENTRY_0: Unhandled param type PARV
+    # Could not define dynload_entry_0: Unhandled param type PARV
 
-    # Could not define DYNLOAD_ENTRY_1: Unhandled param type PARV
+    # Could not define dynload_entry_1: Unhandled param type PARV
 
-    # Could not define DYNLOAD_ENTRY_2: Unhandled param type PARV
+    # Could not define dynload_entry_2: Unhandled param type PARV
 
-    # Could not define DYNLOAD_ENTRY_3: Unhandled param type PARV
+    # Could not define dynload_entry_3: Unhandled param type PARV
 
-    # Could not define DYNLOAD_ENTRY_4: Unhandled param type PARV
+    # Could not define dynload_entry_4: Unhandled param type PARV
 
-    # Could not define DYNLOAD_ENTRY_5: Unhandled param type PARV
+    # Could not define dynload_entry_5: Unhandled param type PARV
 
-    # Could not define DYNLOAD_ENTRY_6: Unhandled param type PARV
+    # Could not define dynload_entry_6: Unhandled param type PARV
 
-    # Could not define DYNLOAD_ENTRY_7: Unhandled param type PARV
+    # Could not define dynload_entry_7: Unhandled param type PARV
 
-    # Could not define DYNLOAD_ENTRY_8: Unhandled param type PARV
+    # Could not define dynload_entry_8: Unhandled param type PARV
 
-    # Could not define DYNLOAD_ENTRY_9: Unhandled param type PARV
+    # Could not define dynload_entry_9: Unhandled param type PARV
 
     # Get the index of the currently loaded VM
     # @param result [PAR8] (out) VM Index, Robotc = 0, Labview = 1, -1 for no loaded VM
@@ -9397,6 +9397,5 @@ module Lignite
       csym = MULTIPLEX_TST.fetch(cvalue)
       __send__("tst_#{csym}", *args)
     end
-
   end
 end
