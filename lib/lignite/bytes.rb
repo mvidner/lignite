@@ -33,8 +33,16 @@ module Lignite
       s.unpack("e").first
     end
 
-    def hexdump(s)
-      s.unpack("H*").first
+    # @param hex [String] "413432"
+    # @return [ByteString] "A42"
+    def hex_to_bin(hex)
+      [hex].pack("H*")
+    end
+
+    # @param bin [ByteString] "A42"
+    # @return [String] "413432"
+    def bin_to_hex(bin)
+      bin.unpack("H*").first
     end
   end
 end

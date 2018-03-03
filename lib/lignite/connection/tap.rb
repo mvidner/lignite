@@ -5,6 +5,8 @@ module Lignite
     # An adapter that delegates to another connection
     # and records the communication
     class Tap < Connection
+      include Bytes
+
       def initialize(conn, filename)
         raise "File #{filename} exists, will not overwrite" if File.exist?(filename)
         @conn = conn
@@ -31,14 +33,6 @@ module Lignite
         File.write(@filename, y)
         super
         @conn.close
-      end
-
-      private
-
-      # @param bin [ByteString] "A42"
-      # @return [String] "413432"
-      def bin_to_hex(bin)
-        bin.unpack("H*").first
       end
     end
   end

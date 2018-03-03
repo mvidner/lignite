@@ -15,6 +15,7 @@ require "lignite/op_compiler"
 require "lignite/rbf_object"
 require "lignite/system_commands"
 require "lignite/variables"
+require "lignite/version"
 
 module Lignite
   PORT_A = 1

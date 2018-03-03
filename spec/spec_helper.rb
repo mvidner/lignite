@@ -13,7 +13,6 @@ if ENV["COVERAGE"] || ENV["TRAVIS"]
   top = File.expand_path("../..", __FILE__)
   # track all ruby files under lib
   SimpleCov.track_files("#{top}/lib/**/*.rb")
-  SimpleCov.track_files("bin/ev3tool")
   # filter out the huge generated file
   SimpleCov.add_filter("ev3_ops.rb")
 
@@ -26,4 +25,8 @@ if ENV["COVERAGE"] || ENV["TRAVIS"]
     ]
   end
   SimpleCov.start
+end
+
+def datadir
+  File.expand_path("../data", __FILE__)
 end

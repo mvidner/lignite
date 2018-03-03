@@ -16,6 +16,7 @@ describe Lignite::DirectCommands do
       allow_any_instance_of(Lignite::DirectCommands).to receive(:sleep)
       ENV["LIGNITE_REPLAY"] = replay_yml
       expect { load(script) }.not_to raise_error
+      ENV["LIGNITE_REPLAY"] = nil
     end
   end
 

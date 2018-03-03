@@ -61,7 +61,7 @@ module Lignite
       # FIXME: id is not written?!
       logger.debug "VMTHREAD #{id}"
       logger.debug "  size #{bodyc.bytes.bytesize}"
-      logger.debug "  " + hexdump(bodyc.bytes)
+      logger.debug "  " + bin_to_hex(bodyc.bytes)
       @objects << RbfObject.vmthread(body: bodyc.bytes, local_bytes: @locals.bytesize)
     end
   end

@@ -5,8 +5,6 @@ require "fileutils"
 
 describe Lignite::Assembler do
   shared_examples "compiles" do |base, asm_version|
-    let(:datadir) { File.expand_path("../data", __FILE__) }
-
     let(:in_rb) { "#{datadir}/#{base}.rb" }
     let(:actual_rbf) { "#{datadir}/#{base}.out.rbf" }
     let(:expected_rbf) { "#{datadir}/#{base}.rbf" }

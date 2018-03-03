@@ -23,12 +23,12 @@ Style/SymbolArray:
 Metrics/BlockLength:
   Exclude:
     - lignite.gemspec
-    - bin/ev3tool
+    - lib/lignite/ev3_tool.rb
     - spec/**/*.rb
 
 Metrics/ClassLength:
   Exclude:
-    - bin/ev3tool
+    - lib/lignite/ev3_tool.rb
     - lib/lignite/motors.rb
 
 Metrics/MethodLength:
