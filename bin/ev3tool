@@ -52,37 +52,45 @@ class Ev3Tool < Thor
   desc "list-files DIRNAME", "list DIRNAME in a long format"
   map "ls-l" => "list-files"
   def list_files(name)
-    name ||= EV3TOOL_HOME
-    name = "#{EV3TOOL_HOME}/#{name}" unless name.start_with?("/")
-
-    result = ""
-    fsize, handle, data = sc.list_files(4096, name)
-    loop do
-      result += data
-      fsize -= data.bytesize
-      break if fsize.zero?
-      handle, data = sc.continue_list_files(handle, 4096)
-    end
-    result
-  rescue Lignite::VMError
-    nil
+    puts raw_list_files(name)
   end
 
   desc "ls DIRNAME", "list DIRNAME in a short format"
   def ls(name)
-    raw = list_files(name)
-    return nil if raw.nil?
-
-    raw.lines.map do |l|
-      l = l.chomp
-      next nil if ["./", "../"].include?(l)
-      next l if l.end_with?("/")
-      # skip checksum + space + size + space
-      l[32 + 1 + 8 + 1..-1]
-    end.compact
+    puts raw_ls(name)
   end
 
   no_commands do
+    def raw_list_files(name)
+      name ||= EV3TOOL_HOME
+      name = "#{EV3TOOL_HOME}/#{name}" unless name.start_with?("/")
+
+      result = ""
+      fsize, handle, data = sc.list_files(4096, name)
+      loop do
+        result += data
+        fsize -= data.bytesize
+        break if fsize.zero?
+        handle, data = sc.continue_list_files(handle, 4096)
+      end
+      result
+    rescue Lignite::VMError
+      nil
+    end
+
+    def raw_ls(name)
+      raw = raw_list_files(name)
+      return nil if raw.nil?
+
+      raw.lines.map do |l|
+        l = l.chomp
+        next nil if ["./", "../"].include?(l)
+        next l if l.end_with?("/")
+        # skip checksum + space + size + space
+        l[32 + 1 + 8 + 1..-1]
+      end.compact
+    end
+
     def runnable_name(name)
       if name.start_with?("/")
         name
@@ -120,7 +128,7 @@ class Ev3Tool < Thor
     def file_exist?(name)
       dirname = File.dirname(name)
       filename = File.basename(name)
-      files = ls(dirname) || []
+      files = raw_ls(dirname) || []
       files.include?(filename)
     end
 
