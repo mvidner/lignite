@@ -18,6 +18,10 @@ end
 class Ev3Tool < Thor
   include Lignite::Bytes
 
+  def self.exit_on_failure?
+    true
+  end
+
   desc "upload LOCAL_FILENAME [BRICK_FILENAME]", "upload a program or a file"
   map "ul" => "upload"
   def upload(local_filename, brick_filename = nil)
@@ -78,18 +82,23 @@ class Ev3Tool < Thor
     end.compact
   end
 
+  no_commands do
+    def runnable_name(name)
+      if name.start_with?("/")
+        name
+      elsif name.include?("/")
+        "#{EV3TOOL_HOME}/#{name}"
+      else
+        "#{EV3TOOL_HOME}/#{name}/#{name}.rbf"
+      end
+    end
+  end
+
   desc "start NAME", "start a program"
   def start(name)
-    if name.include?("/")
-      name = "#{EV3TOOL_HOME}/#{name}" unless name.start_with?("/")
-    else
-      name = "#{EV3TOOL_HOME}/#{name}/#{name}.rbf"
-    end
+    name = runnable_name(name)
 
-    unless file_exist?(name)
-      $stderr.puts "File #{name.inspect} not found"
-      exit 1
-    end
+    raise Thor::Error, "File #{name.inspect} not found on the brick" unless file_exist?(name)
 
     slot = Lignite::USER_SLOT
     no_debug = 0
@@ -126,13 +135,15 @@ class Ev3Tool < Thor
           #{e.message}
 MSG
 
-      template = Lignite::Connection::Bluetooth.template_config_filename
-      if !File.exist?(fn) && File.exist?(template)
-        FileUtils.mkdir_p(File.dirname(fn))
-        FileUtils.install(template, fn)
-        $stderr.puts "(A template config file has been copied for your convenience)"
-      end
-      exit 1
+      try_config_from_template(fn, Lignite::Connection::Bluetooth.template_config_filename)
+      raise Thor::Error, ""
+    end
+
+    def try_config_from_template(config_fn, template_fn)
+      return unless !File.exist?(config_fn) && File.exist?(template_fn)
+      FileUtils.mkdir_p(File.dirname(config_fn))
+      FileUtils.install(template_fn, config_fn)
+      $stderr.puts "(A template config file has been copied for your convenience)"
     end
 
     def sc
