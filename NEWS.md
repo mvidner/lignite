@@ -2,7 +2,10 @@
 
 ## unreleased
 
-- Generate Ev3Ops ahead of time, enabling YARD docs for them
+## 0.4.0, 2018-03-04
+
+- Generate Ev3Ops ahead of time, enabling YARD docs for them,
+  reducing startup time
 - Fixed `ev3tool ls`, `ls-l`, `start`, all broken in 0.3.0
 
 ## 0.3.0, 2018-03-02
