@@ -35,6 +35,7 @@ module Lignite
     # empty class, just for documentation purposes
   end
 
+  # Represents an error returned by the robot
   class VMError < RuntimeError
   end
 end

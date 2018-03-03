@@ -1,4 +1,7 @@
+# This file is generated from ev3.yml. DO NOT EDIT.
+
 module Lignite
+  # Bytecodes implemented by EV3
   module Ev3Ops
     # This code does not exist in normal program
     def error

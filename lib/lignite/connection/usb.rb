@@ -2,10 +2,12 @@
 require "libusb"
 
 module Lignite
+  # No robot USB device was found
   class NoUsbDevice < RuntimeError
   end
 
   class Connection
+    # A {Connection} over a USB cable
     class Usb < Connection
       include Logger
 

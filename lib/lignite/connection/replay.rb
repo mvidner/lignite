@@ -2,6 +2,7 @@ require "yaml"
 
 module Lignite
   class Connection
+    # Errors that may happen when using a {Replay} connection.
     class ReplayError < RuntimeError
     end
 

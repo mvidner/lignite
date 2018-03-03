@@ -2,7 +2,7 @@
 require "lignite"
 require "thor"
 require "fileutils"
-include Lignite::Bytes
+require "unindent"
 
 # The VM current working directory is /home/root/lms2012/sys
 # which is not very useful. A better default is /home/root/lms2012/prjs
@@ -14,7 +14,10 @@ def phandles
   puts "OPEN HANDLES: ", hexdump(handles)
 end
 
+# Implements the `ev3tool` command line interface
 class Ev3Tool < Thor
+  include Lignite::Bytes
+
   desc "upload LOCAL_FILENAME [BRICK_FILENAME]", "upload a program or a file"
   map "ul" => "upload"
   def upload(local_filename, brick_filename = nil)
@@ -114,13 +117,13 @@ class Ev3Tool < Thor
 
     def assisted_connection
       Lignite::Connection.create
-    rescue => e
+    rescue StandardError => e
       fn = Lignite::Connection::Bluetooth.config_filename
-      $stderr.puts <<MSG
-Could not connect to EV3.
-Use a USB cable or configure a Bluetooth address in #{fn.inspect}.
-Details:
-  #{e.message}
+      $stderr.puts <<MSG.unindent
+        Could not connect to EV3.
+        Use a USB cable or configure a Bluetooth address in #{fn.inspect}.
+        Details:
+          #{e.message}
 MSG
 
       template = Lignite::Connection::Bluetooth.template_config_filename

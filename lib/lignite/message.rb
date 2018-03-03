@@ -71,6 +71,7 @@ module Lignite
     end
   end
 
+  # A reply to a SystemCommand
   class SystemReply < Message
     def initialize(msgid:, error:, body:)
       @msgid = msgid
@@ -87,6 +88,7 @@ module Lignite
     end
   end
 
+  # A reply to a DirectCommand
   class DirectReply < Message
     def initialize(msgid:, error:, body:)
       @msgid = msgid

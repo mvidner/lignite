@@ -2,6 +2,7 @@ require "socket"
 
 module Lignite
   class Connection
+    # A {Connection} over Bluetooth
     class Bluetooth < Connection
       AF_BLUETOOTH = 31
       BTPROTO_RFCOMM = 3

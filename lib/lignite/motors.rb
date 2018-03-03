@@ -144,7 +144,7 @@ module Lignite
       dc.output_clr_count(layer, nos)
     end
 
-    def get_count
+    def get_count # rubocop:disable Naming/AccessorMethodName, upstream API name
       layer = @layer
       nos_as_indices.map do |no|
         tachos = dc.with_reply do

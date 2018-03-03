@@ -80,7 +80,6 @@ module Lignite
   # Port not empty and type is invalid
   TYPE_ERROR = 127
 
-
   # enum: SLOT
   # Program ID's (Slots)
 
@@ -104,7 +103,6 @@ module Lignite
 
   CURRENT_SLOT = -1
 
-
   # enum: BUTTONTYPE
   # Button
 
@@ -126,7 +124,6 @@ module Lignite
 
   BUTTONTYPES = 8
 
-
   # enum: BROWSERTYPE
   # Browser Types Avaliable
 
@@ -145,7 +142,6 @@ module Lignite
   # Maximum browser types supported by the VM
   BROWSERTYPES = 4
 
-
   # enum: FONTTYPE
   # Font Types Avaliable
 
@@ -159,7 +155,6 @@ module Lignite
 
   # Maximum font types supported by the VM
   FONTTYPES = 4
-
 
   # enum: ICONTYPE
   # Icon Types Avaliable
@@ -179,7 +174,6 @@ module Lignite
 
   # Maximum icon types supported by the VM
   ICONTYPES = 5
-
 
   # enum: S_ICON_NO
 
@@ -218,7 +212,6 @@ module Lignite
   SICON_USB = 21
 
   S_ICON_NOS = 22
-
 
   # enum: N_ICON_NO
 
@@ -292,7 +285,6 @@ module Lignite
 
   N_ICON_NOS = 35
 
-
   # enum: L_ICON_NO
 
   YES_NOTSEL = 0
@@ -349,7 +341,6 @@ module Lignite
 
   L_ICON_NOS = 28
 
-
   # enum: M_ICON_NO
 
   ICON_STAR = 0
@@ -380,7 +371,6 @@ module Lignite
 
   M_ICON_NOS = 11
 
-
   # enum: A_ICON_NO
 
   ICON_LEFT = 1
@@ -388,7 +378,6 @@ module Lignite
   ICON_RIGHT = 2
 
   A_ICON_NOS = 3
-
 
   # enum: BTTYPE
   # Bluetooth Device Types
@@ -406,7 +395,6 @@ module Lignite
   BTTYPE_UNKNOWN = 6
 
   BTTYPES = 7
-
 
   # enum: LEDPATTERN
   # LED Pattern
@@ -433,7 +421,6 @@ module Lignite
 
   LEDPATTERNS = 10
 
-
   # enum: LEDTYPE
 
   # All LEDs
@@ -450,7 +437,6 @@ module Lignite
 
   # Left green
   LED_LG = 4
-
 
   # enum: FILETYPE
   # File Types Avaliable
@@ -481,7 +467,6 @@ module Lignite
 
   TYPE_REFRESH_BROWSER = -2
 
-
   # enum: RESULT
   # Describes result from executing functions
 
@@ -499,7 +484,6 @@ module Lignite
 
   # Start
   START = 8
-
 
   # enum: DATA_FORMAT
   # Data formats used in device type formats
@@ -536,7 +520,6 @@ module Lignite
 
   DATA_FORMATS = 20
 
-
   # enum: DEL
   # Delimiter codes used to define how data is separated in files
 
@@ -566,7 +549,6 @@ module Lignite
 
   DELS = 8
 
-
   # enum: HWTYPE
   # Hardware Transport Layer
 
@@ -578,7 +560,6 @@ module Lignite
 
   HWTYPES = 4
 
-
   # enum: ENCRYPT
   # Encryption Types
 
@@ -588,7 +569,6 @@ module Lignite
 
   ENCRYPTS = 2
 
-
   # enum: LMS_ENCRYPT
   # Encryption Types
 
@@ -597,7 +577,6 @@ module Lignite
   LMS_ENCRYPT_WPA2 = 1
 
   LMS_ENCRYPTS = 2
-
 
   # enum: COLOR
 
@@ -610,7 +589,6 @@ module Lignite
   BLANK = 3
 
   COLORS = 4
-
 
   # enum: NXTCOLOR
   # Constants related to color sensor value using Color sensor as color detector
@@ -626,7 +604,6 @@ module Lignite
   REDCOLOR = 5
 
   WHITECOLOR = 6
-
 
   # enum: WARNING
   # Warnings
@@ -649,7 +626,6 @@ module Lignite
 
   WARNINGS = 63
 
-
   # enum: OBJSTAT
   # Values used to describe an object's status
 
@@ -665,7 +641,6 @@ module Lignite
   # Object is halted because a call is in progress
   HALTED = 128
 
-
   # enum: DEVCMD
   # Device commands used to control (UART sensors) devices
 
@@ -680,5 +655,5 @@ module Lignite
 
   DEVCMDS = 19
 
-
+  # .
 end

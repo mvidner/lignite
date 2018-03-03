@@ -240,4 +240,5 @@ module Lignite
 
   POP3_ABS_WARN_LINE_ENDX = 155
 
+  # .
 end

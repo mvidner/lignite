@@ -1,4 +1,5 @@
 module Lignite
+  # This enables sending commands without wrapping them in a .rbf program
   class DirectCommands
     include Bytes
 

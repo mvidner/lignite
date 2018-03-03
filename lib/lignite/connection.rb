@@ -1,4 +1,7 @@
 module Lignite
+  # The communication channel to the robot.
+  # The callers use {#send} and {#receive}.
+  # Subclasses implement {#read}, {#write} and {#close}.
   class Connection
     include Bytes
     include Logger
@@ -24,6 +27,16 @@ module Lignite
     def initialize
       @buf = ""
     end
+
+    # @!group Subclasses must implement
+
+    # @!method read(maxlen)
+    #   @param maxlen [Integer]
+
+    # @!method write(data)
+    #   @param data [ByteString]
+
+    # @!endgroup
 
     def close
       Connection.reset
@@ -51,11 +64,6 @@ module Lignite
       res = bufread(size)
       res
     end
-
-    # @!group Subclasses must implement
-    # @!method read(maxlen)
-    # @!method write(data)
-    # @!method close
 
     private
 

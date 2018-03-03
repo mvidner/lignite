@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 require "yaml"
 require "erb"
+require "unindent"
 
 class TODO < RuntimeError
 end
@@ -12,15 +13,18 @@ end
 
 def rendered_file(yml_hash)
   op_hash = yml_hash["ops"]
-    
-  main_template = ERB.new(<<RUBY, nil, "<>-")
-module Lignite
-  module Ev3Ops
-<% op_hash.each do |oname, odata| -%>
-<%=   rendered_op2(oname, odata) %>
-<% end -%>
-  end
-end
+
+  main_template = ERB.new(<<RUBY.unindent, nil, "<>-")
+    # This file is generated from ev3.yml. DO NOT EDIT.
+
+    module Lignite
+      # Bytecodes implemented by EV3
+      module Ev3Ops
+    <% op_hash.each do |oname, odata| -%>
+    <%=   rendered_op2(oname, odata) %>
+    <% end -%>
+      end
+    end
 RUBY
   main_template.result(binding)
 end
@@ -64,6 +68,7 @@ def rendered_multiop(oname, commands)
 RUBY
   end
 
+  # rubocop:disable Layout/IndentHeredoc, we do want the precise indentation
   result = <<RUBY
 
     MULTIPLEX_#{oname} = {
@@ -77,6 +82,7 @@ RUBY
       __send__("#{osym}_\#{csym}", *args)
     end
 RUBY
+  # rubocop:enable Layout/IndentHeredoc
   result
 end
 
@@ -111,7 +117,7 @@ RUBY
   params.each do |p|
     n = p["name"].downcase
     t = p["type"]
-    s << "    # @param #{n} [#{t}] (#{p['dir']}) #{p['desc']}\n"
+    s << "    # @param #{n} [#{t}] (#{p["dir"]}) #{p["desc"]}\n"
   end
   s << <<RUBY
     def #{osym}#{param_decl}
@@ -120,7 +126,7 @@ RUBY
         "called #{osym} with \#{args.inspect}"
       end
 
-      bytes = u8(#{format('0x%02X', ovalue)})
+      bytes = u8(#{format("0x%02X", ovalue)})
 RUBY
   s << "      bytes += param_simple(#{cvalue})\n" unless cvalue.nil?
   param_names.zip(param_handlers).each do |pname, phand|
