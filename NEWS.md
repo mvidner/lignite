@@ -2,6 +2,8 @@
 
 ## unreleased
 
+- Generate Ev3Ops ahead of time, enabling YARD docs for them
+
 ## 0.3.0, 2018-03-02
 
 - Added Tap and Replay to simulate a real robot with YAML files for tests

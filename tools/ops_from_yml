@@ -1,0 +1,164 @@
+#!/usr/bin/ruby
+require "yaml"
+require "erb"
+
+class TODO < RuntimeError
+end
+
+def load_const(name, value, desc)
+  "    # #{desc.to_s.chomp}\n" \
+  "    Lignite::#{name} = #{value.inspect}\n\n"
+end
+
+def rendered_file(yml_hash)
+  op_hash = yml_hash["ops"]
+    
+  main_template = ERB.new(<<RUBY, nil, "<>-")
+module Lignite
+  module Ev3Ops
+<% op_hash.each do |oname, odata| -%>
+<%=   rendered_op2(oname, odata) %>
+<% end -%>
+  end
+end
+RUBY
+  main_template.result(binding)
+end
+
+# @param oname [String] "PROGRAM_STOP"
+# @return [String] Ruby code
+def rendered_op2(oname, odata)
+  ovalue = odata["value"]
+  oparams = odata["params"]
+  p1 = oparams.first
+  if p1 && p1["type"] == "SUBP"
+    commands = p1["commands"]
+    s = ""
+    commands.each do |cname, cdata|
+      cdesc = cdata["desc"]
+      cvalue = cdata["value"]
+      s << load_const(cname, cvalue, cdesc)
+      cparams = cdata["params"]
+      s << rendered_op4("#{oname}_#{cname}", cdesc, ovalue, cvalue, cparams)
+    end
+    s << rendered_multiop(oname, commands)
+    s
+  else
+    rendered_op4(oname, odata["desc"], ovalue, nil, oparams)
+  end
+end
+
+# @return [String] Ruby code
+def rendered_multiop(oname, commands)
+  names = commands.map do |cname, cdata|
+    csym = cname.downcase.to_sym
+    cvalue = cdata["value"]
+    [cvalue, csym]
+  end.to_h
+
+  osym = oname.downcase.to_sym
+
+  multiplex_values = names.map do |cvalue, csym|
+    <<RUBY
+      #{cvalue} => #{csym.inspect},
+RUBY
+  end
+
+  result = <<RUBY
+
+    MULTIPLEX_#{oname} = {
+#{multiplex_values.join("").chomp}
+    }.freeze
+
+    def #{osym}(*args)
+      logger.debug "called #{osym} with \#{args.inspect}"
+      cvalue = args.shift
+      csym = MULTIPLEX_#{oname}.fetch(cvalue)
+      __send__("#{osym}_\#{csym}", *args)
+    end
+RUBY
+  result
+end
+
+# @param oname [String] "MOVE32_32"
+# @param ovalue [Integer] 0x3A
+# @param cvalue [Integer,nil]
+# @return [String] Ruby code
+def rendered_op4(oname, odesc, ovalue, cvalue, params)
+  s = ""
+
+  param_handlers = params.map do |par|
+    case par["type"]
+    when "PAR8", "PAR16", "PAR32", "PARF"
+      :param_simple
+    when "PARNO"
+      :param_multiple
+    else
+      raise TODO, "Unhandled param type #{par["type"]}"
+    end
+  end
+
+  param_names = params.map do |par|
+    (par["type"] == "PARNO" ? "*" : "") + par["name"].downcase
+  end
+  param_decl = param_names.join ", "
+  param_decl = "(#{param_decl})" unless param_decl.empty?
+
+  osym = oname.downcase.to_sym
+  s << <<RUBY
+    # #{odesc.to_s.chomp}
+RUBY
+  params.each do |p|
+    n = p["name"].downcase
+    t = p["type"]
+    s << "    # @param #{n} [#{t}] (#{p['dir']}) #{p['desc']}\n"
+  end
+  s << <<RUBY
+    def #{osym}#{param_decl}
+      logger.debug do
+        args = [#{param_names.join ", "}]
+        "called #{osym} with \#{args.inspect}"
+      end
+
+      bytes = u8(#{format('0x%02X', ovalue)})
+RUBY
+  s << "      bytes += param_simple(#{cvalue})\n" unless cvalue.nil?
+  param_names.zip(param_handlers).each do |pname, phand|
+    s << "      bytes += #{phand}(#{pname})\n"
+  end
+  s << <<RUBY
+      logger.debug "returning bytecode: \#{bytes.inspect}"
+      bytes
+    end
+RUBY
+  s
+rescue TODO => e
+  "    # Could not define #{oname}: #{e.message}\n"
+end
+
+def whitespace_cleanup(s)
+  s.lines.map(&:rstrip).join("\n") + "\n"
+end
+
+def render_erb_file(erb_filename, a_binding)
+  safe = nil
+  trim = "<>-"
+  erb = ERB.new(File.read(erb_filename), safe, trim)
+  out_filename = erb_filename.sub(/\.erb$/, "")
+  header = "# This file is generated from its .erb template. DO NOT EDIT.\n\n"
+  rendered = erb.result(a_binding)
+  rendered = whitespace_cleanup(rendered)
+  File.write(out_filename, header + rendered)
+end
+
+# run this via "rake ops"
+yml = YAML.load_file(ARGV[0])
+out_fn = ARGV[1]
+
+rendered = rendered_file(yml)
+rendered = whitespace_cleanup(rendered)
+File.write(out_fn, rendered)
+
+libdir = File.expand_path("..", out_fn)
+render_erb_file("#{libdir}/defines.rb.erb", binding)
+render_erb_file("#{libdir}/enums.rb.erb", binding)

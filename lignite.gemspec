@@ -52,7 +52,12 @@ TXT
     "lib/lignite/connection/replay.rb",
     "lib/lignite/connection/tap.rb",
     "lib/lignite/connection/usb.rb",
+    "lib/lignite/defines.rb",
+    "lib/lignite/defines.rb.erb",
     "lib/lignite/direct_commands.rb",
+    "lib/lignite/enums.rb",
+    "lib/lignite/enums.rb.erb",
+    "lib/lignite/ev3_ops.rb",
     "lib/lignite/logger.rb",
     "lib/lignite/message.rb",
     "lib/lignite/motors.rb",
@@ -81,7 +86,8 @@ TXT
     "spec/data/VernierReadout.rbf",
     "spec/direct_commands_spec.rb",
     "spec/spec_helper.rb",
-    "spec/system_commands_spec.rb"
+    "spec/system_commands_spec.rb",
+    "tools/ops_from_yml"
   ]
 
   s.executables = s.files.grep(/^bin\//) { |f| File.basename(f) }

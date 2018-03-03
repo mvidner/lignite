@@ -1,0 +1,13 @@
+<%# This ERB template uses Ruby to generate Ruby. -%>
+module Lignite
+<% yml["defines"].each do |dname, ddata| -%>
+<%   desc = ddata["desc"] -%>
+<%   if desc -%>
+  # <%= desc %>
+<%   end -%>
+<%   dvalue = ddata["value"].inspect -%>
+<%   dvalue += ".freeze" if dvalue[0] == '"' -%>
+  <%= dname %> = <%= dvalue %>
+
+<% end -%>
+end

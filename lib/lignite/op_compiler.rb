@@ -1,137 +1,18 @@
-require "yaml"
+require "lignite/defines"
+require "lignite/enums"
+require "lignite/ev3_ops"
 
 module Lignite
-  # Dynamically constructs methods for all the instructions in ev3.yml
+  # Compiles methods for all the instructions in ev3.yml
   # The methods return the {ByteString}s corresponding to the ops.
   class OpCompiler
-    # TODO: doing it dynamically
-    # - is slow
-    # - makes the implementation harder to understand
-    # - means we cannot use YARD to document the API
-    # Therefore we should generate (most of) op_compiler.rb statically from
-    # ev3.yml ahead of the time.
-
-    include Bytes
     include Logger
-    extend Logger
-
-    # A marker for features that are not implemented yet
-    class TODO < StandardError
-    end
-
-    def self.load_const(name, value)
-      raise "duplicate constant #{name}" if Lignite.const_defined?(name)
-      Lignite.const_set(name, value)
-    end
-
-    def self.load_op(oname, odata)
-      ovalue = odata["value"]
-      oparams = odata["params"]
-      p1 = oparams.first
-      if p1 && p1["type"] == "SUBP"
-        commands = p1["commands"]
-        commands.each do |cname, cdata|
-          cvalue = cdata["value"]
-          load_const(cname, cvalue)
-          cparams = cdata["params"]
-          define_op("#{oname}_#{cname}", ovalue, cvalue, cparams)
-        end
-        define_multiop(oname, commands)
-      else
-        define_op(oname, ovalue, nil, oparams)
-      end
-    end
-
-    def self.define_multiop(oname, commands)
-      names = commands.map do |cname, cdata|
-        csym = cname.downcase.to_sym
-        cvalue = cdata["value"]
-        [cvalue, csym]
-      end.to_h
-
-      osym = oname.downcase.to_sym
-      define_method(osym) do |*args|
-        logger.debug "called #{osym} with #{args.inspect}"
-        cvalue = args.shift
-        csym = names.fetch(cvalue)
-        send("#{osym}_#{csym}", *args)
-      end
-    end
-
-    def self.define_op(oname, ovalue, cvalue, params)
-      check_arg_count = true
-      param_handlers = params.map do |par|
-        case par["type"]
-        when "PARLAB"           # a label, only one opcode
-          raise TODO
-        when "PARNO"            # the value says how many other params follow
-          check_arg_count = false
-          ->(x) { param_simple(x) }
-        when "PARS"             # string
-          raise TODO
-        when "PARV"             # value, type depends
-          raise TODO
-        when "PARVALUES"
-          raise TODO
-        when "PAR8", "PAR16", "PAR32", "PARF"
-          ->(x) { param_simple(x) }
-        else
-          raise "Unhandled param type #{par["type"]}"
-        end
-      end
-
-      osym = oname.downcase.to_sym
-      define_method(osym) do |*args|
-        logger.debug "called #{osym} with #{args.inspect}"
-        if check_arg_count && args.size != param_handlers.size
-          raise ArgumentError, "expected #{param_handlers.size} arguments, got #{args.size}"
-        end
-
-        bytes = u8(ovalue)
-        bytes += param_simple(cvalue) unless cvalue.nil?
-
-        bytes += args.zip(param_handlers).map do |a, h|
-          h ||= ->(x) { param_simple(x) }
-          # h.call(a) would have self = Op instead of #<Op>
-          instance_exec(a, &h)
-        end.join("")
-        logger.debug "returning bytecode: #{bytes.inspect}"
-        bytes
-      end
-    rescue TODO
-      logger.debug "Could not define #{oname}"
-    end
-
-    @loaded = false
-
-    def self.load_yml
-      return if @loaded
-      fname = File.expand_path("../../../data/ev3.yml", __FILE__)
-      yml = YAML.load_file(fname)
-      op_hash = yml["ops"]
-      op_hash.each do |oname, odata|
-        load_op(oname, odata)
-      end
-
-      defines = yml["defines"]
-      defines.each do |dname, ddata|
-        load_const(dname, ddata["value"])
-      end
-
-      enums = yml["enums"]
-      enums.each_value do |edata|
-        edata["members"].each do |mname, mdata|
-          load_const(mname, mdata["value"])
-        end
-      end
-
-      @loaded = true
-    end
+    include Bytes
+    include Ev3Ops
 
     # @param globals [Variables,nil]
     # @param locals  [Variables,nil]
     def initialize(globals = nil, locals = nil)
-      self.class.load_yml
       @globals = globals
       @locals = locals
     end
@@ -216,6 +97,11 @@ module Lignite
       else
         raise "Variable #{sym} not found"
       end
+    end
+
+    # @return [ByteString]
+    def param_multiple(*args)
+      args.map { |a| param_simple(a) }.join("")
     end
 
     # @return [ByteString]

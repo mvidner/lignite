@@ -1,0 +1,21 @@
+<%# This ERB template uses Ruby to generate Ruby. -%>
+module Lignite
+<% yml["enums"].each do |ename, edata| -%>
+  # enum: <%= ename%>
+<%   edesc = edata["desc"] -%>
+<%   if edesc -%>
+  # <%= edesc %>
+<%   end -%>
+
+<%   members = edata["members"] -%>
+<%   members.each do |mname, mdata| -%>
+<%     mdesc = mdata["desc"] -%>
+<%     if mdesc -%>
+  # <%= mdesc %>
+<%     end -%>
+  <%= mname %> = <%= mdata["value"].inspect %>
+
+<%   end -%>
+
+<% end -%>
+end
