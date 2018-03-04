@@ -1,4 +1,3 @@
-
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|
     # If you misremember a method name both in code and in tests,
@@ -32,8 +31,25 @@ def datadir
 end
 
 # for better displays in rspec failure diffs
-def rbf_dump(filename)
-  File.read(filename, encoding: Encoding::BINARY).bytes.map do |n|
+def rbf_dump(bytestring, offsets: false)
+  lines = bytestring.bytes.map do |n|
     format("0x%02x %3d %s", n, n, n.chr.inspect)
-  end.join "\n"
+  end
+  if offsets
+    lines.each_with_index do |l, i|
+      l.replace("#{i}: #{l}")
+    end
+  end
+  lines.join "\n"
+end
+
+def expect_rbf_files_same(actual_rbf, expected_rbf)
+  actual_bytes = File.read(actual_rbf, encoding: Encoding::BINARY)
+  expected_bytes = File.read(expected_rbf, encoding: Encoding::BINARY)
+
+  show_offsets = actual_bytes.bytesize == expected_bytes.bytesize
+  actual_dump = rbf_dump(actual_bytes, offsets: show_offsets)
+  expected_dump = rbf_dump(expected_bytes, offsets: show_offsets)
+
+  expect(actual_dump).to eq(expected_dump)
 end

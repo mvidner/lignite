@@ -11,7 +11,8 @@ describe Lignite::Assembler do
 
     it "correctly assembles #{base}" do
       subject.assemble(in_rb, actual_rbf, version: asm_version)
-      expect(rbf_dump(actual_rbf)).to eq(rbf_dump(expected_rbf))
+
+      expect_rbf_files_same(actual_rbf, expected_rbf)
       FileUtils.rm actual_rbf
     end
   end
