@@ -34,7 +34,7 @@ vmthread :MAIN do
     strings(NUMBER_FORMATTED, :Data1, "%1d", 8, :String)
     ui_draw(TEXT, FG_COLOR, 64, 30, :String)
 
-    input_device(READY_RAW, 0, PORT, 0, :Mode, 3, :Data1, :Data2, :Data3)
+    input_device(READY_RAW, 0, PORT, 0, :Mode, :Data1, :Data2, :Data3)
 
     and32(:Data1, 0xFFFF, :Data1)
     strings(NUMBER_FORMATTED, :Data1, "%-5d", 8, :String)

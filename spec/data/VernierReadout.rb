@@ -13,7 +13,7 @@ vmthread :MAIN do
     ui_draw(TEXT, FG_COLOR, 0, 50, "Raw 1")
     ui_draw(SELECT_FONT, NORMAL_FONT)
 
-    input_device(READY_RAW, 0, PORT, 1, 0, 1, :Data1)
+    input_device(READY_RAW, 0, PORT, 1, 0, :Data1)
 
     and32(:Data1, 0xFFFF, :Data1)
     strings(NUMBER_FORMATTED, :Data1, "%-5d", 8, :String)

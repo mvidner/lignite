@@ -2,6 +2,10 @@
 
 ## unreleased
 
+- Corrected the variable argument calling convention (PARNO).
+  Before, it was necessary to manually add a parameter specifying the number
+  of the remaining parameters. Now it is automatic.
+
 ## 0.4.0, 2018-03-04
 
 - Generate Ev3Ops ahead of time, enabling YARD docs for them,
