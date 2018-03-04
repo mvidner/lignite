@@ -4,11 +4,15 @@ module Lignite
   # bad:  data8 :speed; data32 :tacho; output_read(...)
   # good  data32 :tacho; data8 :speed; output_read(...)
   class Variables
+    include Bytes
+
     def initialize
       @offset = 0
       # for proper decoding of direct replies according to declared types
       @unpacker = ""
       @vars = {}
+      @param_count = 0
+      @param_decl_bytes = ""
     end
 
     # declare
@@ -17,6 +21,16 @@ module Lignite
       @vars[id] = { offset: @offset, size: size }
       @offset += size
       @unpacker += unpacker
+    end
+
+    # declare a subroutine parameter
+    def param(name, size, size_code, direction)
+      raise "Duplicate parameter #{name}" if @vars.key?(name)
+      nonsense_unpacker = "," # FIXME: better
+      add(name, size, nonsense_unpacker)
+
+      @param_count += 1
+      @param_decl_bytes += u8(size_code | direction)
     end
 
     # use
@@ -32,6 +46,10 @@ module Lignite
     # compile
     def bytesize
       @offset
+    end
+
+    def param_decl_header
+      u8(@param_count) + @param_decl_bytes
     end
 
     # decode reply

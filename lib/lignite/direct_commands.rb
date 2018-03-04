@@ -1,3 +1,5 @@
+require "lignite/rbf_declarer"
+
 module Lignite
   # This enables sending commands without wrapping them in a .rbf program
   class DirectCommands
@@ -35,7 +37,7 @@ module Lignite
 
     def block(&body)
       locals = Variables.new
-      bodyc = BodyCompiler.new(@globals, locals)
+      bodyc = BodyCompiler.new(@globals, locals, RbfDeclarer::Dummy.new)
       bodyc.instance_exec(&body)
 
       bs = bodyc.bytes

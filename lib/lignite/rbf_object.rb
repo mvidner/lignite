@@ -27,8 +27,13 @@ module Lignite
       @body = body
     end
 
-    def header(pos_before_header = 0)
-      u32(pos_before_header + 12) + # size of header
+    HEADER_SIZE = 12
+    def size
+      HEADER_SIZE + body.bytesize
+    end
+
+    def header(object_instruction_offset)
+      u32(object_instruction_offset) +
         u16(@owner) + u16(@triggers) + u32(@local_bytes)
     end
   end
