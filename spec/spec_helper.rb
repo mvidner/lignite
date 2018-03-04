@@ -30,3 +30,10 @@ end
 def datadir
   File.expand_path("../data", __FILE__)
 end
+
+# for better displays in rspec failure diffs
+def rbf_dump(filename)
+  File.read(filename, encoding: Encoding::BINARY).bytes.map do |n|
+    format("0x%02x %3d %s", n, n, n.chr.inspect)
+  end.join "\n"
+end
