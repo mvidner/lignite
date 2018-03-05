@@ -1,4 +1,30 @@
 module Lignite
+  # Less-than (32 bit)
+  class Lt32 # < Condition
+    def initialize(a, b)
+      @a = a
+      @b = b
+    end
+
+    def not
+      Ge32.new(@a, @b)
+    end
+
+    def jump_forward(compiler, body_size)
+      compiler.jr_lt32(@a, @b, Complex(body_size, 2))
+    end
+
+    def jump_back(compiler, body_size, self_size = nil)
+      if self_size.nil?
+        fake = compiler.clone_context
+        jump_back(fake, body_size, 0)
+        self_size = fake.bytes.bytesize
+      end
+
+      compiler.jr_lt32(@a, @b, Complex(- (body_size + self_size), 2))
+    end
+  end
+
   # Extends {OpCompiler} by
   # - variable declarations: {VariableDeclarer}
   # - high level flow control: {#loop}
@@ -32,6 +58,10 @@ module Lignite
       @op_compiler = OpCompiler.new(@globals, @locals)
     end
 
+    def clone_context
+      BodyCompiler.new(@globals, @locals, @declared_objects)
+    end
+
     def if(flag8, &body)
       subc = BodyCompiler.new(@globals, @locals, @declared_objects)
       subc.instance_exec(&body)
@@ -52,8 +82,24 @@ module Lignite
       subc = BodyCompiler.new(@globals, @locals, @declared_objects)
       subc.instance_exec(&body)
       @bytes << subc.bytes
-      # the jump takes up 4 bytes: JR_TRUE, LV0(flag8), LC2, LO, HI
+      # the jump takes up 5 bytes: JR_TRUE, LV0(flag8), LC2, LO, HI
       jr_true(flag8, Complex(- (subc.bytes.bytesize + 5), 2))
+    end
+
+    def loop_while(a, b)
+      if a.respond_to? :call
+        loop_while_post(b, &a)
+      else
+        loop_while_pre(a, &b)
+      end
+    end
+
+    def loop_while_post(condition, &body)
+      subc = BodyCompiler.new(@globals, @locals, @declared_objects)
+      subc.instance_exec(&body)
+      @bytes << subc.bytes
+      body_size = subc.bytes.bytesize
+      condition.jump_back(self, body_size)
     end
 
     def call(name, *args)

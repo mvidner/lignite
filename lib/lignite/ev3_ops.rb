@@ -7521,7 +7521,22 @@ module Lignite
     #
     Lignite::FILL = 6
 
-    # Could not define array_fill: Unhandled param type PARV
+    #
+    # @param handle [PAR16] (in) Array handle
+    # @param value [PARV] (in) Value to write - type depends on type of array
+    def array_fill(handle, value)
+      logger.debug do
+        args = [handle, value]
+        "called array_fill with #{args.inspect}"
+      end
+
+      bytes = u8(0xC1)
+      bytes += param_simple(6)
+      bytes += param_simple(handle)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
     #
     Lignite::COPY = 7
 
@@ -7693,11 +7708,57 @@ module Lignite
       __send__("array_#{csym}", *args)
     end
 
-    # Could not define array_write: Unhandled param type PARV
+    # Array element write
+    # @param handle [PAR16] (in) Array handle
+    # @param index [PAR32] (in) Index to first byte to write
+    # @param value [PARV] (in) Value to write - type depends on type of array
+    def array_write(handle, index, value)
+      logger.debug do
+        args = [handle, index, value]
+        "called array_write with #{args.inspect}"
+      end
 
-    # Could not define array_read: Unhandled param type PARV
+      bytes = u8(0xC2)
+      bytes += param_simple(handle)
+      bytes += param_simple(index)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
 
-    # Could not define array_append: Unhandled param type PARV
+    # Array element read
+    # @param handle [PAR16] (in) Array handle
+    # @param index [PAR32] (in) Index to first byte to write
+    # @param value [PARV] (out) Value to read - type depends on type of array
+    def array_read(handle, index, value)
+      logger.debug do
+        args = [handle, index, value]
+        "called array_read with #{args.inspect}"
+      end
+
+      bytes = u8(0xC3)
+      bytes += param_simple(handle)
+      bytes += param_simple(index)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
+
+    # Array element append
+    # @param handle [PAR16] (in) Array handle
+    # @param value [PARV] (in) Value (new element) to append - type depends on type of array
+    def array_append(handle, value)
+      logger.debug do
+        args = [handle, value]
+        "called array_append with #{args.inspect}"
+      end
+
+      bytes = u8(0xC4)
+      bytes += param_simple(handle)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
 
     # Get memory usage
     # @param total [PAR32] (out) Total memory [KB]
@@ -9092,25 +9153,205 @@ module Lignite
       bytes
     end
 
-    # Could not define dynload_entry_0: Unhandled param type PARV
+    # Execute Entry Point function 0 in Third Party VM
+    # @param cmd [PAR8] (in) Sub command to be executed
+    # @param length_in [PAR8] (in) Amount of data passed to this opcode
+    # @param length_out [PAR16] (out) Amount of data returned
+    # @param value [PARV] (out) Data from opcode
+    def dynload_entry_0(cmd, length_in, length_out, value)
+      logger.debug do
+        args = [cmd, length_in, length_out, value]
+        "called dynload_entry_0 with #{args.inspect}"
+      end
 
-    # Could not define dynload_entry_1: Unhandled param type PARV
+      bytes = u8(0xF2)
+      bytes += param_simple(cmd)
+      bytes += param_simple(length_in)
+      bytes += param_simple(length_out)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
 
-    # Could not define dynload_entry_2: Unhandled param type PARV
+    # Execute Entry Point function 1 in Third Party VM
+    # @param cmd [PAR8] (in) Sub command to be executed
+    # @param length_in [PAR8] (in) Amount of data passed to this opcode
+    # @param length_out [PAR16] (out) Amount of data returned
+    # @param value [PARV] (out) Data from opcode
+    def dynload_entry_1(cmd, length_in, length_out, value)
+      logger.debug do
+        args = [cmd, length_in, length_out, value]
+        "called dynload_entry_1 with #{args.inspect}"
+      end
 
-    # Could not define dynload_entry_3: Unhandled param type PARV
+      bytes = u8(0xF3)
+      bytes += param_simple(cmd)
+      bytes += param_simple(length_in)
+      bytes += param_simple(length_out)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
 
-    # Could not define dynload_entry_4: Unhandled param type PARV
+    # Execute Entry Point function 2 in Third Party VM
+    # @param cmd [PAR8] (in) Sub command to be executed
+    # @param length_in [PAR8] (in) Amount of data passed to this opcode
+    # @param length_out [PAR16] (out) Amount of data returned
+    # @param value [PARV] (out) Data from opcode
+    def dynload_entry_2(cmd, length_in, length_out, value)
+      logger.debug do
+        args = [cmd, length_in, length_out, value]
+        "called dynload_entry_2 with #{args.inspect}"
+      end
 
-    # Could not define dynload_entry_5: Unhandled param type PARV
+      bytes = u8(0xF4)
+      bytes += param_simple(cmd)
+      bytes += param_simple(length_in)
+      bytes += param_simple(length_out)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
 
-    # Could not define dynload_entry_6: Unhandled param type PARV
+    # Execute Entry Point function 3 in Third Party VM
+    # @param cmd [PAR8] (in) Sub command to be executed
+    # @param length_in [PAR8] (in) Amount of data passed to this opcode
+    # @param length_out [PAR16] (out) Amount of data returned
+    # @param value [PARV] (out) Data from opcode
+    def dynload_entry_3(cmd, length_in, length_out, value)
+      logger.debug do
+        args = [cmd, length_in, length_out, value]
+        "called dynload_entry_3 with #{args.inspect}"
+      end
 
-    # Could not define dynload_entry_7: Unhandled param type PARV
+      bytes = u8(0xF5)
+      bytes += param_simple(cmd)
+      bytes += param_simple(length_in)
+      bytes += param_simple(length_out)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
 
-    # Could not define dynload_entry_8: Unhandled param type PARV
+    # Execute Entry Point function 4 in Third Party VM
+    # @param cmd [PAR8] (in) Sub command to be executed
+    # @param length_in [PAR8] (in) Amount of data passed to this opcode
+    # @param length_out [PAR16] (out) Amount of data returned
+    # @param value [PARV] (out) Data from opcode
+    def dynload_entry_4(cmd, length_in, length_out, value)
+      logger.debug do
+        args = [cmd, length_in, length_out, value]
+        "called dynload_entry_4 with #{args.inspect}"
+      end
 
-    # Could not define dynload_entry_9: Unhandled param type PARV
+      bytes = u8(0xF6)
+      bytes += param_simple(cmd)
+      bytes += param_simple(length_in)
+      bytes += param_simple(length_out)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
+
+    # Execute Entry Point function 5 in Third Party VM
+    # @param cmd [PAR8] (in) Sub command to be executed
+    # @param length_in [PAR8] (in) Amount of data passed to this opcode
+    # @param length_out [PAR16] (out) Amount of data returned
+    # @param value [PARV] (out) Data from opcode
+    def dynload_entry_5(cmd, length_in, length_out, value)
+      logger.debug do
+        args = [cmd, length_in, length_out, value]
+        "called dynload_entry_5 with #{args.inspect}"
+      end
+
+      bytes = u8(0xF7)
+      bytes += param_simple(cmd)
+      bytes += param_simple(length_in)
+      bytes += param_simple(length_out)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
+
+    # Execute Entry Point function 6 in Third Party VM
+    # @param cmd [PAR8] (in) Sub command to be executed
+    # @param length_in [PAR8] (in) Amount of data passed to this opcode
+    # @param length_out [PAR16] (out) Amount of data returned
+    # @param value [PARV] (out) Data from opcode
+    def dynload_entry_6(cmd, length_in, length_out, value)
+      logger.debug do
+        args = [cmd, length_in, length_out, value]
+        "called dynload_entry_6 with #{args.inspect}"
+      end
+
+      bytes = u8(0xF8)
+      bytes += param_simple(cmd)
+      bytes += param_simple(length_in)
+      bytes += param_simple(length_out)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
+
+    # Execute Entry Point function 7 in Third Party VM
+    # @param cmd [PAR8] (in) Sub command to be executed
+    # @param length_in [PAR8] (in) Amount of data passed to this opcode
+    # @param length_out [PAR16] (out) Amount of data returned
+    # @param value [PARV] (out) Data from opcode
+    def dynload_entry_7(cmd, length_in, length_out, value)
+      logger.debug do
+        args = [cmd, length_in, length_out, value]
+        "called dynload_entry_7 with #{args.inspect}"
+      end
+
+      bytes = u8(0xF9)
+      bytes += param_simple(cmd)
+      bytes += param_simple(length_in)
+      bytes += param_simple(length_out)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
+
+    # Execute Entry Point function 8 in Third Party VM
+    # @param cmd [PAR8] (in) Sub command to be executed
+    # @param length_in [PAR8] (in) Amount of data passed to this opcode
+    # @param length_out [PAR16] (out) Amount of data returned
+    # @param value [PARV] (out) Data from opcode
+    def dynload_entry_8(cmd, length_in, length_out, value)
+      logger.debug do
+        args = [cmd, length_in, length_out, value]
+        "called dynload_entry_8 with #{args.inspect}"
+      end
+
+      bytes = u8(0xFA)
+      bytes += param_simple(cmd)
+      bytes += param_simple(length_in)
+      bytes += param_simple(length_out)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
+
+    # Execute Entry Point function 9 in Third Party VM
+    # @param cmd [PAR8] (in) Sub command to be executed
+    # @param length_in [PAR8] (in) Amount of data passed to this opcode
+    # @param length_out [PAR16] (out) Amount of data returned
+    # @param value [PARV] (out) Data from opcode
+    def dynload_entry_9(cmd, length_in, length_out, value)
+      logger.debug do
+        args = [cmd, length_in, length_out, value]
+        "called dynload_entry_9 with #{args.inspect}"
+      end
+
+      bytes = u8(0xFB)
+      bytes += param_simple(cmd)
+      bytes += param_simple(length_in)
+      bytes += param_simple(length_out)
+      bytes += param_simple(value)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
 
     # Get the index of the currently loaded VM
     # @param result [PAR8] (out) VM Index, Robotc = 0, Labview = 1, -1 for no loaded VM

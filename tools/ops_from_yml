@@ -90,7 +90,7 @@ end
 def param_handler(par)
   par_type = par["type"]
   case par_type
-  when "PAR8", "PAR16", "PAR32", "PARF"
+  when "PAR8", "PAR16", "PAR32", "PARF", "PARV"
     :param_simple
   when "PARNO"
     :param_multiple

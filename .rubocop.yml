@@ -20,6 +20,11 @@ Performance/RedundantBlockCall:
 Style/SymbolArray:
   Enabled: false
 
+# self.sleep is Ev3Ops#sleep, sleep is Kernel#sleep
+Style/RedundantSelf:
+  Exclude:
+    - spec/data/*.rb
+
 Metrics/BlockLength:
   Exclude:
     - lignite.gemspec

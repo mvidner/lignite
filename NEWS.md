@@ -2,6 +2,8 @@
 
 ## unreleased
 
+- Ev3Ops: added missing array_* ops (with PARV in the signature).
+- loop_while added, with a Condition prototype: Lt32.
 - Corrected the variable argument calling convention (PARNO).
   Before, it was necessary to manually add a parameter specifying the number
   of the remaining parameters. Now it is automatic.

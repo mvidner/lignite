@@ -23,4 +23,5 @@ describe Lignite::Assembler do
   it_behaves_like "compiles", "ColorReadout", 106
   it_behaves_like "compiles", "NoDebug"
   it_behaves_like "compiles", "p11"
+  it_behaves_like "compiles", "Performance"
 end
