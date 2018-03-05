@@ -2,6 +2,8 @@
 
 ## unreleased
 
+## 0.5.0, 2018-03-05
+
 - Ev3Ops: added missing array_* ops (with PARV in the signature).
 - loop_while added, with a Condition prototype: Lt32.
 - Corrected the variable argument calling convention (PARNO).
