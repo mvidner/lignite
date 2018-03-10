@@ -5,18 +5,22 @@ module Lignite
   class Connection
     include Bytes
     include Logger
+    extend Logger
 
     # @return [Connection] Try a {Usb} connection first, then a {Bluetooth} one.
     def self.create
       @c ||= Replay.new(ENV["LIGNITE_REPLAY"]) if ENV["LIGNITE_REPLAY"]
 
       @c ||= begin
+               logger.debug "Connection: trying USB"
                Usb.new
              rescue NoUsbDevice
+               logger.debug "Connection: trying BT"
                Bluetooth.new
              end
 
       @c = Tap.new(@c, ENV["LIGNITE_TAP"]) if ENV["LIGNITE_TAP"]
+      logger.debug "Connection: #{@c.inspect}"
       @c
     end
 
