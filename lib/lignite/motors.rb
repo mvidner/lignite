@@ -13,9 +13,18 @@ module Lignite
 
     # 0x02 | 0x04 | 0x08 -> [1, 2, 3]
     def nos_as_indices
-      [0, 1, 2, 3].find_all do |n|
+      r = [0, 1, 2, 3].find_all do |n|
         (nos & (1 << n)) != 0
       end
+      r
+    end
+
+    # 0x02 | 0x04 | 0x08 -> [0x02, 0x04, 0x08]
+    def nos_as_bits
+      r = [1, 2, 4, 8].find_all do |n|
+        (nos & n) != 0
+      end
+      r
     end
 
     def initialize(layer, nos, dc = Lignite::DirectCommands.new)
@@ -85,17 +94,17 @@ module Lignite
     end
 
     # ATTR running?
+    # @return [Boolean] true if busy/running
     def test
       layer = @layer
-      nos_as_indices.map do |no|
-        busy = dc.with_reply do
-          data8 :busy
-          block do
-            output_test(layer, no, :busy)
-          end
+      nos = @nos
+      busy = dc.with_reply do
+        data8 :busy
+        block do
+          output_test(layer, nos, :busy)
         end
-        busy
       end
+      busy != 0
     end
 
     # which commands are affected? not output_start they say
