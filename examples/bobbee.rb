@@ -13,14 +13,20 @@ class Bobbee
   # Interface to all other commands
   # @return [Lignite::DirectCommands]
   attr_reader :dc
+  # The robot is built with a https://en.wikipedia.org/wiki/Worm_drive
+  # lift mechanism
+  # @return [Boolean]
+  attr_reader :worm_lift
 
   def initialize(drive: Lignite::PORT_B | Lignite::PORT_C,
                  lift: Lignite::PORT_A,
-                 dc: Lignite::DirectCommands.new)
+                 dc: Lignite::DirectCommands.new,
+                 worm_lift: false)
     layer = 0
     @drive = Lignite::Motors.new(layer, drive, dc)
     @lift = Lignite::Motors.new(layer, lift, dc)
     @dc = dc
+    @worm_lift = worm_lift
   end
 
   # @param speed [Integer] -100..100
@@ -43,34 +49,51 @@ class Bobbee
   end
 
   LIFT_FULL = 220
+  WORM_LIFT_FULL = 2400
 
   # Raise the fork from the ground up
   def raise(wait: true)
-    lift.step_power(30, 10, LIFT_FULL - 20, 10)
+    if worm_lift
+      lift.step_power(-30, 10, WORM_LIFT_FULL - 20, 10)
+    else
+      lift.step_power(30, 10, LIFT_FULL - 20, 10)
+    end
     lift.ready if wait
   end
 
   # Raise the fork one third of the way from the ground up
   def third_raise(wait: true)
-    lift.step_power(30, 10, LIFT_FULL / 3 - 20, 10)
+    if worm_lift
+      lift.step_power(-30, 10, WORM_LIFT_FULL / 3 - 20, 10)
+    else
+      lift.step_power(30, 10, LIFT_FULL / 3 - 20, 10)
+    end
     lift.ready if wait
 
     beep
-    sleep 3
+    ready
   end
 
   # Lower the fork from above to the ground
   def lower(wait: true)
-    lift.step_power(-1, 10, LIFT_FULL - 20, 10) # , Lignite::COAST)
+    if worm_lift
+      lift.step_power(30, 10, WORM_LIFT_FULL - 20, 10)
+    else
+      lift.step_power(-1, 10, LIFT_FULL - 20, 10)
+    end
     lift.ready if wait
 
     beep
-    sleep 3
+    ready
   end
 
   # Lower the fork one third of the way from above to the ground
   def third_lower(wait: true)
-    lift.step_power(-1, 10, LIFT_FULL / 3 - 20, 10)
+    if worm_lift
+      lift.step_power(30, 10, WORM_LIFT_FULL / 3 - 20, 10)
+    else
+      lift.step_power(-1, 10, LIFT_FULL / 3 - 20, 10)
+    end
     lift.ready if wait
   end
 
@@ -87,14 +110,14 @@ class Bobbee
   def forward(steps = SQUARE_STEPS)
     step_sync(50, 0, steps)
     beep
-    sleep 3
+    ready
   end
 
   # Drive backward 1 square on the Boost mat
   def back(steps = SQUARE_STEPS)
     step_sync(-50, 0, back_factor(steps))
     beep
-    sleep 3
+    ready
   end
 
   # Compensation factor when moving backward
@@ -121,37 +144,49 @@ class Bobbee
 
   # Motor degrees needed to turn the robot 90 degrees when using turn=200
   TURN_90_AT_200_STEPS = 600
+  # Similar, but when we're carrying 100 grams, turning becomes harder!
+  LOADED_TURN_90_AT_200_STEPS = 750
 
   # Turn 90 degrees left, simply by moving tracks in opposite directions
-  def left_immediate
-    step_sync(50, -200, TURN_90_AT_200_STEPS)
+  def left_immediate(loaded: false)
+    steps = loaded ? LOADED_TURN_90_AT_200_STEPS : TURN_90_AT_200_STEPS
+    step_sync(50, -200, steps)
     beep(100)
-    sleep 3
+    ready
   end
 
   # Turn 90 degrees right, simply by moving tracks in opposite directions
-  def right_immediate
-    step_sync(50, 200, TURN_90_AT_200_STEPS)
+  def right_immediate(loaded: false)
+    steps = loaded ? LOADED_TURN_90_AT_200_STEPS : TURN_90_AT_200_STEPS
+    step_sync(50, 200, steps)
     beep(100)
-    sleep 3
+    ready
   end
 
   # Turn 90 degrees left, starting and ending inside a Boost mat square
-  def left
+  def left(loaded: false)
     align_centers_for_turning do
-      left_immediate
+      left_immediate(loaded: loaded)
     end
   end
 
   # Turn 90 degrees right, starting and ending inside a Boost mat square
-  def right
+  def right(loaded: false)
     align_centers_for_turning do
-      right_immediate
+      right_immediate(loaded: loaded)
     end
   end
-end
 
-bb = Bobbee.new
+  # Wait until the previous motor movements are complete
+  def ready
+    return unless @dc.is_a? Lignite::DirectCommands
+
+    print "Ready... "
+    drive.test
+    lift.test
+    puts "OK"
+  end
+end
 
 # Put Bobb3e (B) on the blue arrow (^). Move it one square left, and forward.
 # Put the container on a raised platform on the "twins" square (T).
@@ -169,18 +204,18 @@ def from_twins_to_fire(bb)
 
     right
     forward
-    third_raise
+    2.times { third_raise }
     back
-    left
+    left(loaded: true)
     # we're at the starting position, but carrying the load
 
     # move towards the recipient
     2.times { forward }
-    right
+    right(loaded: true)
 
     # deliver and unload
     forward
-    third_lower
+    2.times { third_lower }
     back
 
     # resting position
@@ -202,17 +237,17 @@ def from_fire_to_twins(bb)
 
     # load
     forward
-    third_raise
+    2.times { third_raise }
     back
 
     # starting position
-    left
+    left(loaded: true)
     2.times { back }
 
     # deliver
-    right
+    right(loaded: true)
     forward
-    third_lower
+    2.times { third_lower }
     back
     left
 
@@ -228,6 +263,17 @@ def calibrate_forward_and_back(bb)
   end
 end
 
+mode = ARGV.first || "direct"
+dc = if mode == "rbf"
+       Lignite::SimpleAssembler.new
+     else
+       Lignite::DirectCommands.new
+     end
+
+bb = Bobbee.new(dc: dc, worm_lift: true)
+
 # calibrate_forward_and_back(bb)
 from_twins_to_fire(bb)
 # from_fire_to_twins(bb)
+
+dc.write("bobbee.rbf") if mode == "rbf"

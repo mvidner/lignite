@@ -26,9 +26,14 @@ module Lignite
     end
 
     # @return [Array<RbfObject>]
-    attr_reader :objects
+    attr_accessor :objects
     # @return [Variables]
-    attr_reader :globals
+    attr_accessor :globals
+
+    def initialize
+      @objects = []
+      @globals = Variables.new
+    end
 
     # Assemble a complete RBF program file.
     # (it is OK to reuse an Assembler and call this several times in a sequence)
@@ -36,9 +41,8 @@ module Lignite
     # @param rb_filename [String] input
     # @param rbf_filename [String] output
     def assemble(rb_filename, rbf_filename, version: 109)
+      initialize
       rb_text = File.read(rb_filename)
-      @objects = []
-      @globals = Variables.new
 
       @declarer = RbfDeclarer.new
       @declarer.instance_eval(rb_text, rb_filename, 1) # 1 is the line number
@@ -47,7 +51,7 @@ module Lignite
       write(rbf_filename, version)
     end
 
-    def write(rbf_filename, version)
+    def write(rbf_filename, version = 109)
       image_size = HEADER_SIZE + @objects.map(&:size).reduce(0, :+)
 
       File.open(rbf_filename, "w") do |f|
@@ -97,6 +101,38 @@ module Lignite
       end
       @objects << RbfObject.subcall(body:        bodyc.param_decl_header + bodyc.bytes,
                                     local_bytes: @locals.bytesize)
+    end
+  end
+
+  # Acts like DirectCommands but instead of executing, assembles them to a RBF file
+  class SimpleAssembler
+    def initialize
+      @globals = Variables.new
+      @locals = Variables.new
+      @declarer = RbfDeclarer::Dummy.new
+
+      @interp = BodyCompiler.new(@globals, @locals, @declarer)
+    end
+
+    def write(rbf_filename)
+      @interp.object_end
+      vmthread = RbfObject.vmthread(body: @interp.bytes, local_bytes: @locals.bytesize)
+
+      asm = Assembler.new
+      asm.objects = [vmthread]
+      asm.globals = @globals
+      asm.write(rbf_filename)
+    end
+
+    # Delegate the ops to the {BodyCompiler},
+    def method_missing(name, *args, &block)
+      super unless @interp.respond_to?(name)
+
+      @interp.public_send(name, *args, &block)
+    end
+
+    def respond_to_missing?(name, _include_private)
+      @interp.respond_to?(name) || super
     end
   end
 end
