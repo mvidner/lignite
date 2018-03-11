@@ -52,10 +52,13 @@ describe Lignite::Ev3Tool do
 
     it "communicates the right thing" do
       expected_file_contents = File.read("#{datadir}/everstorm.rbf", mode: "rb")
+      e1 = expected_file_contents[0...1000]
+      e2 = expected_file_contents[1000..-1]
       f = double("File")
       expect(File).to receive(:open).with("everstorm.rbf", "w").and_yield(f)
       allow(File).to receive(:open).and_call_original
-      expect(f).to receive(:write).with(expected_file_contents)
+      expect(f).to receive(:write).with(e1)
+      expect(f).to receive(:write).with(e2)
 
       expect { subject.download("../prjs/everstorm/everstorm.rbf") }.not_to raise_error
     end

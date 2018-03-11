@@ -32,14 +32,15 @@ module Lignite
     desc "download BRICK_FILENAME [LOCAL_FILENAME]", "download a file"
     map "dl" => "download"
     def download(brick_filename, local_filename = nil)
+      chunk_size = 1000 # 2000 stalls, 4096 goes out of sync in our code
       local_filename ||= File.basename(brick_filename)
-      fsize, handle, data = sc.begin_upload(4096, brick_filename)
+      fsize, handle, data = sc.begin_upload(chunk_size, brick_filename)
       File.open(local_filename, "w") do |f|
         loop do
           f.write(data)
           fsize -= data.bytesize
           break if fsize.zero?
-          handle, data = sc.continue_upload(handle, 4096)
+          handle, data = sc.continue_upload(handle, chunk_size)
         end
       end
     end

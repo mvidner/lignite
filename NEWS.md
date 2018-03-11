@@ -2,6 +2,8 @@
 
 ## unreleased
 
+- Fixed silent corruption of files obtained by `ev3tool download`
+
 ## 0.5.0, 2018-03-05
 
 - Ev3Ops: added missing array_* ops (with PARV in the signature).
