@@ -56,6 +56,12 @@ module Lignite
       puts raw_ls(name)
     end
 
+    desc "asm RUBYFILE RBFFILE", "assemble RUBYFILE to RBFFILE"
+    def asm(ruby_fn, rbf_fn)
+      a = Assembler.new
+      a.assemble(ruby_fn, rbf_fn)
+    end
+
     no_commands do
       def raw_list_files(name)
         name ||= EV3TOOL_HOME
