@@ -123,6 +123,10 @@ module Lignite
         u8(0x80) + x + u8(0x00)
       when Float
         u8(0x83) + f32(x)
+      when true
+        param_simple(1)
+      when false
+        param_simple(0)
       when Symbol
         make_var(x).map(&:chr).join("")
       else
