@@ -107,6 +107,8 @@ module Lignite
       raise "Name #{name} not found" if obj_id.nil?
 
       # TODO: check that args match their declaration
+      # In particular, mixing up data32 with dataf passes the VM validity check
+      # but then misinterprets the bits.
       super(obj_id, *args) # Ev3Ops::call
     end
 
