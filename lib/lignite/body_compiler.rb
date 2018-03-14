@@ -1,5 +1,46 @@
 module Lignite
   class Condition
+    # Call that instruction of the compiler
+    # that jumps by *offset* according to the condition that we implement
+    def cond_jump(compiler, offset)
+      raise ScriptError, "subclasses must override this"
+    end
+
+    def jump_forward(compiler, body_size)
+      cond_jump(compiler, body_size)
+    end
+
+    def jump_back(compiler, body_size, self_size = nil)
+      if self_size.nil?
+        fake = compiler.clone_context
+        jump_back(fake, body_size, 0)
+        self_size = fake.bytes.bytesize
+      end
+
+      cond_jump(compiler, - (body_size + self_size))
+    end
+  end
+
+  class Always < Condition
+    def not
+      Never.new
+    end
+
+    def cond_jump(compiler, offset)
+      compiler.jr(Complex(offset, 2))
+    end
+  end
+
+  class Never < Condition
+    def not
+      Always.new
+    end
+
+    def cond_jump(compiler, offset)
+      # Never jump: do a jump of size 0
+      # but it must be a jump because code size calculations need that
+      compiler.jr(Complex(0, 2))
+    end
   end
 
   # Less-than (32 bit)
@@ -10,21 +51,26 @@ module Lignite
     end
 
     def not
-      Ge32.new(@a, @b)
+      Gteq32.new(@a, @b)
     end
 
-    def jump_forward(compiler, body_size)
-      compiler.jr_lt32(@a, @b, Complex(body_size, 2))
+    def cond_jump(compiler, offset)
+      compiler.jr_lt32(@a, @b, Complex(offset, 2))
+    end
+  end
+
+  class Gteq32 < Condition
+    def initialize(a, b)
+      @a = a
+      @b = b
     end
 
-    def jump_back(compiler, body_size, self_size = nil)
-      if self_size.nil?
-        fake = compiler.clone_context
-        jump_back(fake, body_size, 0)
-        self_size = fake.bytes.bytesize
-      end
+    def not
+      Lt32.new(@a, @b)
+    end
 
-      compiler.jr_lt32(@a, @b, Complex(- (body_size + self_size), 2))
+    def cond_jump(compiler, offset)
+      compiler.jr_gteq32(@a, @b, Complex(offset, 2))
     end
   end
 
@@ -37,18 +83,22 @@ module Lignite
       NotFlag.new(@f)
     end
 
-    def jump_forward(compiler, body_size)
-      compiler.jr_true(@f, Complex(body_size, 2))
+    def cond_jump(compiler, offset)
+      compiler.jr_true(@f, Complex(offset, 2))
+    end
+  end
+
+  class NotFlag < Condition
+    def initialize(f)
+      @f = f
     end
 
-    def jump_back(compiler, body_size, self_size = nil)
-      if self_size.nil?
-        fake = compiler.clone_context
-        jump_back(fake, body_size, 0)
-        self_size = fake.bytes.bytesize
-      end
+    def not
+      Flag.new(@f)
+    end
 
-      compiler.jr_true(@f, Complex(- (body_size + self_size), 2))
+    def cond_jump(compiler, offset)
+      compiler.jr_false(@f, Complex(offset, 2))
     end
   end
 
@@ -89,16 +139,31 @@ module Lignite
       BodyCompiler.new(@globals, @locals, @declared_objects)
     end
 
-    def if(flag8, &body)
-      subc = BodyCompiler.new(@globals, @locals, @declared_objects)
+    def if(cond, &body)
+      cond = Flag.new(cond) unless cond.is_a? Condition
+
+      subc = clone_context
       subc.instance_exec(&body)
 
-      jr_false(flag8, Complex(subc.bytes.bytesize, 2))
+      cond.not.jump_forward(self, subc.bytes.bytesize)
       @bytes << subc.bytes
     end
 
+    def if_else(flag8, body_true, body_false)
+      truec = clone_context
+      falsec = clone_context
+      truec.instance_exec(&body_true)
+      falsec.instance_exec(&body_false)
+
+      # 4 is the unconditional jump size
+      jr_false(flag8, Complex(truec.bytes.bytesize + 4, 2))
+      @bytes << truec.bytes
+      jr(Complex(falsec.bytes.bytesize, 2))
+      @bytes << falsec.bytes
+    end
+
     def loop(&body)
-      subc = BodyCompiler.new(@globals, @locals, @declared_objects)
+      subc = clone_context
       subc.instance_exec(&body)
       @bytes << subc.bytes
       # the jump takes up 4 bytes: JR, LC2, LO, HI
@@ -118,11 +183,22 @@ module Lignite
     end
 
     def loop_while_post(condition, &body)
-      subc = BodyCompiler.new(@globals, @locals, @declared_objects)
+      subc = clone_context
       subc.instance_exec(&body)
       @bytes << subc.bytes
       body_size = subc.bytes.bytesize
       condition.jump_back(self, body_size)
+    end
+
+    def loop_until_pre(condition, &body)
+      subc = clone_context
+      subc.instance_exec(&body)
+      ofs1 = @bytes.bytesize
+      condition.jump_forward(self, subc.bytes.bytesize + 4)
+      ofs2 = @bytes.bytesize
+      fw_jump_size = ofs2 - ofs1
+      @bytes << subc.bytes
+      jr(Complex(-( fw_jump_size + subc.bytes.bytesize + 4), 2))
     end
 
     def call(name, *args)

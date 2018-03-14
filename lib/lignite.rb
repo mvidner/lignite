@@ -18,6 +18,8 @@ require "lignite/variables"
 require "lignite/version"
 
 module Lignite
+  LAYER_0 = 0
+
   PORT_A = 1
   PORT_B = 2
   PORT_C = 4
