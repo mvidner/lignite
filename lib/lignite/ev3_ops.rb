@@ -140,7 +140,7 @@ module Lignite
 
       bytes = u8(0x09)
       bytes += param_simple(objid)
-      bytes += param_multiple(*parameters)
+      bytes += param_n_multiple(*parameters)
       logger.debug "returning bytecode: #{bytes.inspect}"
       bytes
     end
@@ -862,7 +862,23 @@ module Lignite
       bytes
     end
 
-    # Could not define init_bytes: Unhandled param type PARVALUES
+    # Move LENGTH number of DATA8 from BYTE STREAM to memory DESTINATION START
+    # @param destination [PAR8] (out) First element in DATA8 array to be initiated
+    # @param length [PAR32] (in) Number of elements to initiate
+    # @param source [PARVALUES] (in) First element to initiate DATA8 array with
+    def init_bytes(destination, length, *source)
+      logger.debug do
+        args = [destination, length, *source]
+        "called init_bytes with #{args.inspect}"
+      end
+
+      bytes = u8(0x2F)
+      bytes += param_simple(destination)
+      bytes += param_simple(length)
+      bytes += param_multiple(*source)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
 
     # Move 8 bit value from SOURCE to DESTINATION
     # @param source [PAR8] (in)
@@ -6045,7 +6061,7 @@ module Lignite
       bytes += param_simple(no)
       bytes += param_simple(type)
       bytes += param_simple(mode)
-      bytes += param_multiple(*values)
+      bytes += param_n_multiple(*values)
       logger.debug "returning bytecode: #{bytes.inspect}"
       bytes
     end
@@ -6070,7 +6086,7 @@ module Lignite
       bytes += param_simple(no)
       bytes += param_simple(type)
       bytes += param_simple(mode)
-      bytes += param_multiple(*values)
+      bytes += param_n_multiple(*values)
       logger.debug "returning bytecode: #{bytes.inspect}"
       bytes
     end
@@ -6095,7 +6111,7 @@ module Lignite
       bytes += param_simple(no)
       bytes += param_simple(type)
       bytes += param_simple(mode)
-      bytes += param_multiple(*values)
+      bytes += param_n_multiple(*values)
       logger.debug "returning bytecode: #{bytes.inspect}"
       bytes
     end
@@ -6277,7 +6293,7 @@ module Lignite
       bytes += param_simple(type)
       bytes += param_simple(mode)
       bytes += param_simple(format)
-      bytes += param_multiple(*values)
+      bytes += param_n_multiple(*values)
       logger.debug "returning bytecode: #{bytes.inspect}"
       bytes
     end
@@ -7559,19 +7575,95 @@ module Lignite
     #
     Lignite::INIT8 = 8
 
-    # Could not define array_init8: Unhandled param type PARVALUES
+    #
+    # @param handle [PAR16] (in) Array handle
+    # @param index [PAR32] (in) Index to element to write
+    # @param elements [PAR32] (in) Number of elements to write
+    # @param values [PARVALUES] (in)
+    def array_init8(handle, index, elements, *values)
+      logger.debug do
+        args = [handle, index, elements, *values]
+        "called array_init8 with #{args.inspect}"
+      end
+
+      bytes = u8(0xC1)
+      bytes += param_simple(8)
+      bytes += param_simple(handle)
+      bytes += param_simple(index)
+      bytes += param_simple(elements)
+      bytes += param_multiple(*values)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
     #
     Lignite::INIT16 = 9
 
-    # Could not define array_init16: Unhandled param type PARVALUES
+    #
+    # @param handle [PAR16] (in) Array handle
+    # @param index [PAR32] (in) Index to element to write
+    # @param elements [PAR32] (in) Number of elements to write
+    # @param values [PARVALUES] (in)
+    def array_init16(handle, index, elements, *values)
+      logger.debug do
+        args = [handle, index, elements, *values]
+        "called array_init16 with #{args.inspect}"
+      end
+
+      bytes = u8(0xC1)
+      bytes += param_simple(9)
+      bytes += param_simple(handle)
+      bytes += param_simple(index)
+      bytes += param_simple(elements)
+      bytes += param_multiple(*values)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
     #
     Lignite::INIT32 = 10
 
-    # Could not define array_init32: Unhandled param type PARVALUES
+    #
+    # @param handle [PAR16] (in) Array handle
+    # @param index [PAR32] (in) Index to element to write
+    # @param elements [PAR32] (in) Number of elements to write
+    # @param values [PARVALUES] (in)
+    def array_init32(handle, index, elements, *values)
+      logger.debug do
+        args = [handle, index, elements, *values]
+        "called array_init32 with #{args.inspect}"
+      end
+
+      bytes = u8(0xC1)
+      bytes += param_simple(10)
+      bytes += param_simple(handle)
+      bytes += param_simple(index)
+      bytes += param_simple(elements)
+      bytes += param_multiple(*values)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
     #
     Lignite::INITF = 11
 
-    # Could not define array_initf: Unhandled param type PARVALUES
+    #
+    # @param handle [PAR16] (in) Array handle
+    # @param index [PAR32] (in) Index to element to write
+    # @param elements [PAR32] (in) Number of elements to write
+    # @param values [PARVALUES] (in)
+    def array_initf(handle, index, elements, *values)
+      logger.debug do
+        args = [handle, index, elements, *values]
+        "called array_initf with #{args.inspect}"
+      end
+
+      bytes = u8(0xC1)
+      bytes += param_simple(11)
+      bytes += param_simple(handle)
+      bytes += param_simple(index)
+      bytes += param_simple(elements)
+      bytes += param_multiple(*values)
+      logger.debug "returning bytecode: #{bytes.inspect}"
+      bytes
+    end
     #
     Lignite::SIZE = 12
 
@@ -8924,7 +9016,7 @@ module Lignite
       bytes += param_simple(hardware)
       bytes += param_simple(boxname)
       bytes += param_simple(type)
-      bytes += param_multiple(*values)
+      bytes += param_n_multiple(*values)
       logger.debug "returning bytecode: #{bytes.inspect}"
       bytes
     end
@@ -8942,7 +9034,7 @@ module Lignite
       bytes = u8(0xDA)
       bytes += param_simple(no)
       bytes += param_simple(length)
-      bytes += param_multiple(*values)
+      bytes += param_n_multiple(*values)
       logger.debug "returning bytecode: #{bytes.inspect}"
       bytes
     end

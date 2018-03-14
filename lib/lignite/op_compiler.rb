@@ -100,8 +100,13 @@ module Lignite
     end
 
     # @return [ByteString]
+    def param_n_multiple(*args)
+      u8(args.size) + param_multiple(*args)
+    end
+
+    # @return [ByteString]
     def param_multiple(*args)
-      u8(args.size) + args.map { |a| param_simple(a) }.join("")
+      args.map { |a| param_simple(a) }.join("")
     end
 
     # @return [ByteString]

@@ -93,6 +93,8 @@ def param_handler(par)
   when "PAR8", "PAR16", "PAR32", "PARF", "PARV"
     :param_simple
   when "PARNO"
+    :param_n_multiple
+  when "PARVALUES"
     :param_multiple
   else
     raise TODO, "Unhandled param type #{par_type}"
@@ -116,10 +118,18 @@ end
 def rendered_op4(oname, odesc, ovalue, cvalue, params) # rubocop:disable Metrics/MethodLength
   s = ""
 
+  # (..., PARVALUES, PAR8) means that there is a variable number of parameters
+  # of type PAR8. But since we do not check types yet, let's treat that
+  # like PARNO, which is a variable number of parameters of unspecified type.
+  if params.fetch(-2, {})["type"] == "PARVALUES"
+    params = params[0 .. -2]
+  end
+
   param_handlers = params.map { |par| param_handler(par) }
 
   param_names = params.map do |par|
-    (par["type"] == "PARNO" ? "*" : "") + par["name"].downcase
+    star = ["PARNO", "PARVALUES"].include?(par["type"]) ? "*" : ""
+    star + par["name"].downcase
   end
   param_decl = param_names.join ", "
   param_decl = "(#{param_decl})" unless param_decl.empty?
