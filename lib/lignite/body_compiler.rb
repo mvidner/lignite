@@ -1,6 +1,9 @@
 module Lignite
+  class Condition
+  end
+
   # Less-than (32 bit)
-  class Lt32 # < Condition
+  class Lt32 < Condition
     def initialize(a, b)
       @a = a
       @b = b
@@ -22,6 +25,30 @@ module Lignite
       end
 
       compiler.jr_lt32(@a, @b, Complex(- (body_size + self_size), 2))
+    end
+  end
+
+  class Flag < Condition
+    def initialize(f)
+      @f = f
+    end
+
+    def not
+      NotFlag.new(@f)
+    end
+
+    def jump_forward(compiler, body_size)
+      compiler.jr_true(@f, Complex(body_size, 2))
+    end
+
+    def jump_back(compiler, body_size, self_size = nil)
+      if self_size.nil?
+        fake = compiler.clone_context
+        jump_back(fake, body_size, 0)
+        self_size = fake.bytes.bytesize
+      end
+
+      compiler.jr_true(@f, Complex(- (body_size + self_size), 2))
     end
   end
 
@@ -79,11 +106,7 @@ module Lignite
     end
 
     def loop_while_postcond(flag8, &body)
-      subc = BodyCompiler.new(@globals, @locals, @declared_objects)
-      subc.instance_exec(&body)
-      @bytes << subc.bytes
-      # the jump takes up 5 bytes: JR_TRUE, LV0(flag8), LC2, LO, HI
-      jr_true(flag8, Complex(- (subc.bytes.bytesize + 5), 2))
+      loop_while(body, Flag.new(flag8))
     end
 
     def loop_while(a, b)
