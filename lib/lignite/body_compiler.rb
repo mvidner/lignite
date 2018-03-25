@@ -53,9 +53,9 @@ module Lignite
       falsec.instance_exec(&body_false)
 
       # 4 is the unconditional jump size
-      jr_false(flag8, Complex(truec.bytes.bytesize + 4, 2))
+      jr_false(flag8, JumpOffset.new(truec.bytes.bytesize + 4))
       @bytes << truec.bytes
-      jr(Complex(falsec.bytes.bytesize, 2))
+      jr(JumpOffset.new(falsec.bytes.bytesize))
       @bytes << falsec.bytes
     end
 
@@ -64,7 +64,7 @@ module Lignite
       subc.instance_exec(&body)
       @bytes << subc.bytes
       # the jump takes up 4 bytes: JR, LC2, LO, HI
-      jr(Complex(- (subc.bytes.bytesize + 4), 2))
+      jr(JumpOffset.new(- (subc.bytes.bytesize + 4)))
     end
 
     def loop_while_postcond(flag8, &body)
@@ -95,7 +95,7 @@ module Lignite
       ofs2 = @bytes.bytesize
       fw_jump_size = ofs2 - ofs1
       @bytes << subc.bytes
-      jr(Complex(-(fw_jump_size + subc.bytes.bytesize + 4), 2))
+      jr(JumpOffset.new(-(fw_jump_size + subc.bytes.bytesize + 4)))
     end
 
     def call(name, *args)

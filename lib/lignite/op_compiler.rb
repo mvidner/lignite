@@ -43,22 +43,29 @@ module Lignite
 
     PRIMPAR_LABEL      = 0x20
 
-    def make_lcn(n, bytes)
-      case bytes
-      when 0
-        [n & PRIMPAR_VALUE]
-      when 1
-        [PRIMPAR_LONG | PRIMPAR_1_BYTE, n & 0xff]
-      when 2
-        [PRIMPAR_LONG | PRIMPAR_2_BYTES, n & 0xff, (n >> 8) & 0xff]
-      else
-        [PRIMPAR_LONG | PRIMPAR_4_BYTES,
-         n & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, (n >> 24) & 0xff]
+    # @param n [Integer] value to encode
+    # @param next_size [Integer] how many bytes follow the initial opcode
+    # @return [ByteString]
+    def numeric_literal_with_size(n, next_size)
+      bytes = case next_size
+              when 0
+                [n & PRIMPAR_VALUE]
+              when 1
+                [PRIMPAR_LONG | PRIMPAR_1_BYTE, n & 0xff]
+              when 2
+                [PRIMPAR_LONG | PRIMPAR_2_BYTES, n & 0xff, (n >> 8) & 0xff]
+              else
+                [PRIMPAR_LONG | PRIMPAR_4_BYTES,
+                 n & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, (n >> 24) & 0xff]
       end
+      bytes.map(&:chr).join("")
     end
 
-    def make_lc(n, bytes = nil)
-      bytes ||= if (-31..31).cover? n
+    # @param n [Integer] value to encode
+    # @param next_size [Integer] how many bytes follow the initial opcode
+    # @return [ByteString]
+    def numeric_literal(n, next_size = nil)
+      next_size ||= if (-31..31).cover? n
         0
       elsif (-127..127).cover? n
         1
@@ -67,12 +74,13 @@ module Lignite
       else
         4
       end
-      make_lcn(n, bytes)
+      numeric_literal_with_size(n, next_size)
     end
 
+    # @return [ByteString]
     def make_v(n, local_or_global)
       vartag = PRIMPAR_VARIABEL | local_or_global
-      if (0..31).cover? n
+      bytes = if (0..31).cover? n
         [vartag | (n & PRIMPAR_VALUE)]
       elsif (0..255).cover? n
         [vartag | PRIMPAR_LONG | PRIMPAR_1_BYTE, n & 0xff]
@@ -82,10 +90,12 @@ module Lignite
         [vartag | PRIMPAR_LONG | PRIMPAR_4_BYTES,
          n & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, (n >> 24) & 0xff]
       end
+      bytes.map(&:chr).join("")
     end
 
     # Reference a variable.
     # (For declaring, see {VariableDeclarer}.)
+    # @return [ByteString]
     def make_var(sym)
       raise "No variables declared, cannot process symbols" if @locals.nil? && @globals.nil?
       if @locals.key?(sym)
@@ -110,25 +120,32 @@ module Lignite
     end
 
     # @return [ByteString]
-    def param_simple(x)
+    def param_simple_numeric(x)
       case x
       when Integer
-        make_lc(x).map(&:chr).join("")
-      when Complex
-        # a Complex number:
-        #   #real: just like an Integer above, but
-        #   #imag tells how many bytes to use for it
-        make_lc(x.real, x.imag).map(&:chr).join("")
-      when String
-        u8(0x80) + x + u8(0x00)
+        numeric_literal(x)
       when Float
         u8(0x83) + f32(x)
+      else
+        raise ArgumentError, "Unexpected type: #{x.class}"
+      end
+    end
+
+    # @return [ByteString]
+    def param_simple(x)
+      case x
+      when Numeric
+        param_simple_numeric(x)
+      when JumpOffset
+        numeric_literal(x.value, x.size)
+      when String
+        u8(0x80) + x + u8(0x00)
       when true
         param_simple(1)
       when false
         param_simple(0)
       when Symbol
-        make_var(x).map(&:chr).join("")
+        make_var(x)
       else
         raise ArgumentError, "Unexpected type: #{x.class}"
       end

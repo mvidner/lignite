@@ -35,7 +35,7 @@ module Lignite
     end
 
     def cond_jump(compiler, offset)
-      compiler.jr(Complex(offset, 2))
+      compiler.jr(JumpOffset.new(offset))
     end
   end
 
@@ -48,7 +48,7 @@ module Lignite
     def cond_jump(compiler, _offset)
       # Never jump: do a jump of size 0
       # but it must be a jump because code size calculations need that
-      compiler.jr(Complex(0, 2))
+      compiler.jr(JumpOffset.new(0))
     end
   end
 
@@ -64,7 +64,7 @@ module Lignite
     end
 
     def cond_jump(compiler, offset)
-      compiler.jr_lt32(@a, @b, Complex(offset, 2))
+      compiler.jr_lt32(@a, @b, JumpOffset.new(offset))
     end
   end
 
@@ -80,7 +80,7 @@ module Lignite
     end
 
     def cond_jump(compiler, offset)
-      compiler.jr_gteq32(@a, @b, Complex(offset, 2))
+      compiler.jr_gteq32(@a, @b, JumpOffset.new(offset))
     end
   end
 
@@ -95,7 +95,7 @@ module Lignite
     end
 
     def cond_jump(compiler, offset)
-      compiler.jr_true(@f, Complex(offset, 2))
+      compiler.jr_true(@f, JumpOffset.new(offset))
     end
   end
 
@@ -110,7 +110,7 @@ module Lignite
     end
 
     def cond_jump(compiler, offset)
-      compiler.jr_false(@f, Complex(offset, 2))
+      compiler.jr_false(@f, JumpOffset.new(offset))
     end
   end
 end

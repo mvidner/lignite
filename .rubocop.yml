@@ -37,6 +37,9 @@ Metrics/ClassLength:
     - lib/lignite/ev3_tool.rb
     - lib/lignite/motors.rb
 
+Metrics/CyclomaticComplexity:
+  Max: 8
+
 Metrics/MethodLength:
   Max: 25
 

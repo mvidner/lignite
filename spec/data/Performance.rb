@@ -437,7 +437,7 @@ sub :Test_JR do
 
   loop_while lambda {
     # TEST ***********************************************
-    jr(Complex(0, 2))
+    jr(0)
     # ****************************************************
     add32(1, :Counter, :Counter)
   }, Lt32.new(:Counter, TIMES)
