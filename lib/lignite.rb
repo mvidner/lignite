@@ -17,6 +17,7 @@ require "lignite/system_commands"
 require "lignite/variables"
 require "lignite/version"
 
+# The main namespace
 module Lignite
   LAYER_0 = 0
 

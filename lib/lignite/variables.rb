@@ -1,8 +1,5 @@
 module Lignite
   # Allocate local or global variables
-  # FIXME: the user can make bad alignment, resulting in VMError at runtime
-  # bad:  data8 :speed; data32 :tacho; output_read(...)
-  # good  data32 :tacho; data8 :speed; output_read(...)
   class Variables
     include Bytes
 
@@ -15,19 +12,27 @@ module Lignite
       @param_decl_bytes = ""
     end
 
-    # declare
-    def add(id, size, unpacker)
+    # Declare a variable/parameter *id*
+    # @param id [Symbol]
+    # @param size [Integer] byte size of one element of the data
+    # @param count [Integer] 1 for scalars, more for arrays
+    # @param unpacker [String] for String#unpack for direct commands
+    def add(id, size, count, unpacker)
       raise "Duplicate variable #{id}" if @vars.key?(id)
-      @vars[id] = { offset: @offset, size: size }
-      @offset += size
+      @offset = align(@offset, size)
+      @vars[id] = { offset: @offset, size: size * count }
+      @offset += size * count
       @unpacker += unpacker
     end
 
     # declare a subroutine parameter
-    def param(name, size, size_code, direction)
+    def param(name, size, count, size_code, direction)
       raise "Duplicate parameter #{name}" if @vars.key?(name)
+      unless @offset == align(@offset, size)
+        raise "Misaligned parameter #{name} of size #{size} at #{@offset}"
+      end
       nonsense_unpacker = "," # FIXME: better
-      add(name, size, nonsense_unpacker)
+      add(name, size, count, nonsense_unpacker)
 
       @param_count += 1
       @param_decl_bytes += u8(size_code | direction)
@@ -57,32 +62,39 @@ module Lignite
       values = buf.unpack(@unpacker)
       values.size == 1 ? values.first : values
     end
+
+    private
+
+    # Round *n* up to a next multiple of *size*
+    def align(n, size)
+      (n + size - 1).div(size) * size
+    end
   end
 
   # `variables` are {Variables}
   module VariableDeclarer
     def data8(id)
-      variables.add(id, 1, "C")
+      variables.add(id, 1, 1, "C")
     end
 
     def data16(id)
-      variables.add(id, 2, "S<")
+      variables.add(id, 2, 1, "S<")
     end
 
     def data32(id)
-      variables.add(id, 4, "L<")
+      variables.add(id, 4, 1, "L<")
     end
 
     def dataf(id)
-      variables.add(id, 4, "e")
+      variables.add(id, 4, 1, "e")
     end
 
     def datas(id, size)
-      variables.add(id, size, "a#{size}")
+      variables.add(id, 1, size, "a#{size}")
     end
 
     def array8(id, count)
-      variables.add(id, count * 1, "C#{count}")
+      variables.add(id, 1, count, "C#{count}")
     end
   end
 end
