@@ -121,9 +121,7 @@ def rendered_op4(oname, odesc, ovalue, cvalue, params) # rubocop:disable Metrics
   # (..., PARVALUES, PAR8) means that there is a variable number of parameters
   # of type PAR8. But since we do not check types yet, let's treat that
   # like PARNO, which is a variable number of parameters of unspecified type.
-  if params.fetch(-2, {})["type"] == "PARVALUES"
-    params = params[0 .. -2]
-  end
+  params = params[0..-2] if params.fetch(-2, {})["type"] == "PARVALUES"
 
   param_handlers = params.map { |par| param_handler(par) }
 

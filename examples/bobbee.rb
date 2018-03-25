@@ -265,10 +265,10 @@ end
 
 mode = ARGV.first || "direct"
 dc = if mode == "rbf"
-       Lignite::SimpleAssembler.new
-     else
-       Lignite::DirectCommands.new
-     end
+  Lignite::SimpleAssembler.new
+else
+  Lignite::DirectCommands.new
+end
 
 bb = Bobbee.new(dc: dc, worm_lift: true)
 

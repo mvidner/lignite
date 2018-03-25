@@ -2,7 +2,7 @@ module Lignite
   class Condition
     # Call that instruction of the compiler
     # that jumps by *offset* according to the condition that we implement
-    def cond_jump(compiler, offset)
+    def cond_jump(_compiler, _offset)
       raise ScriptError, "subclasses must override this"
     end
 
@@ -36,7 +36,7 @@ module Lignite
       Always.new
     end
 
-    def cond_jump(compiler, offset)
+    def cond_jump(compiler, _offset)
       # Never jump: do a jump of size 0
       # but it must be a jump because code size calculations need that
       compiler.jr(Complex(0, 2))
@@ -198,7 +198,7 @@ module Lignite
       ofs2 = @bytes.bytesize
       fw_jump_size = ofs2 - ofs1
       @bytes << subc.bytes
-      jr(Complex(-( fw_jump_size + subc.bytes.bytesize + 4), 2))
+      jr(Complex(-(fw_jump_size + subc.bytes.bytesize + 4), 2))
     end
 
     def call(name, *args)
