@@ -17,6 +17,7 @@ module Lignite
   class Assembler
     include Bytes
     include Logger
+    include Lignite # for constants
 
     HEADER_SIZE = 16
     SIGNATURE = "LEGO".freeze
@@ -49,6 +50,12 @@ module Lignite
       instance_eval(rb_text, rb_filename, 1) # 1 is the line number
 
       write(rbf_filename, version)
+    end
+
+    def compile(&block)
+      @declarer = RbfDeclarer.new
+      @declarer.instance_exec(&block)
+      instance_exec(&block)
     end
 
     def write(rbf_filename, version = 109)

@@ -41,4 +41,11 @@ module Lignite
   # Represents an error returned by the robot
   class VMError < RuntimeError
   end
+
+  def program(&block)
+    p = Assembler.new
+    p.compile(&block)
+    p
+  end
+  module_function :program
 end
