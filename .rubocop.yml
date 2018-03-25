@@ -32,6 +32,7 @@ Metrics/BlockLength:
     - spec/**/*.rb
 
 Metrics/ClassLength:
+  Max: 120
   Exclude:
     - lib/lignite/ev3_tool.rb
     - lib/lignite/motors.rb
