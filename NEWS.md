@@ -2,7 +2,15 @@
 
 ## unreleased
 
+## 0.6.0, 2018-03-25
+
 - Fixed silent corruption of files obtained by `ev3tool download`
+- Added `ev3tool asm foo.rb foo.rbf`
+- Added SimpleAssembler
+- Added BodyCompiler#if_else, #loop_until_pre
+- Implemented array_init* (PARVALUES)
+- Added JumpOffset, replacing the Complex hack
+- Variables are now aligned automatically; subroutine argument alignment is checked
 
 ## 0.5.0, 2018-03-05
 
