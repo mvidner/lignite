@@ -37,9 +37,15 @@ module Lignite
 
     # @!method read(maxlen)
     #   @param maxlen [Integer]
+    def read(_maxlen)
+      raise NotImplementedError
+    end
 
     # @!method write(data)
     #   @param data [ByteString]
+    def write(_data)
+      raise NotImplementedError
+    end
 
     # @!endgroup
 
@@ -57,7 +63,7 @@ module Lignite
 
     # @return [ByteString] a complete message
     def receive
-      size = nil
+      size = T.let(0, Integer)
       loop do
         lenbuf = bufread(2)
         size = unpack_u16(lenbuf)

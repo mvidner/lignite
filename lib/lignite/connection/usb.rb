@@ -43,7 +43,7 @@ module Lignite
 
       # @return [Integer] number of bytes written
       def write(data)
-        written = nil
+        written = T.let(-1, Integer)
         @device.open do |devh|
           devh.auto_detach_kernel_driver = true
           devh.claim_interface(@interface) do
@@ -55,7 +55,7 @@ module Lignite
 
       # @return [String]
       def read(bytes = nil)
-        got = nil
+        got = T.let("", String)
         @device.open do |devh|
           devh.auto_detach_kernel_driver = true
           devh.claim_interface(@interface) do
