@@ -1,3 +1,4 @@
+# typed: false
 require_relative "spec_helper"
 require "lignite/ev3_tool"
 

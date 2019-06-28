@@ -1,3 +1,4 @@
+# typed: false
 vmthread :main do
   data8 :var1
   data8 :var2

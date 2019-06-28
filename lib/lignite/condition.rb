@@ -1,3 +1,4 @@
+# typed: true
 module Lignite
   # Compile a conditional jump forward or backward
   class Condition

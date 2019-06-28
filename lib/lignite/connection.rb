@@ -1,3 +1,4 @@
+# typed: true
 module Lignite
   # The communication channel to the robot.
   # The callers use {#send} and {#receive}.

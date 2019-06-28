@@ -1,3 +1,4 @@
+# typed: true
 module Lignite
   # A Message has 3 common parts:
   # - length u16, (not including the length itself);

@@ -1,3 +1,4 @@
+# typed: false
 require "lignite/defines"
 require "lignite/enums"
 require "lignite/ev3_ops"

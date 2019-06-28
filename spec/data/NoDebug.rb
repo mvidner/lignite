@@ -1,3 +1,4 @@
+# typed: false
 appv = "NoDebug V1.02"
 
 vmthread :MAIN do

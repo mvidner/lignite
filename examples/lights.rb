@@ -1,4 +1,5 @@
 #!/usr/bin/ruby
+# typed: false
 require "lignite"
 
 Lignite::DirectCommands.run do |_dc|

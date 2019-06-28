@@ -1,3 +1,4 @@
+# typed: strong
 # This file is generated from its .erb template. DO NOT EDIT.
 
 module Lignite

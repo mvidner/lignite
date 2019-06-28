@@ -1,3 +1,4 @@
+# typed: false
 PORT = 1
 
 vmthread :MAIN do

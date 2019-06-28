@@ -1,3 +1,4 @@
+# typed: true
 require "yaml"
 
 module Lignite

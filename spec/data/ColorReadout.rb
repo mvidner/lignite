@@ -1,3 +1,4 @@
+# typed: false
 PORT = 1
 
 # global vars - unused?!

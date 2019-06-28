@@ -1,3 +1,4 @@
+# typed: true
 module Lignite
   # A specialized Integer.
   # When compiling jumps, the jump instruction itself must have a constant size

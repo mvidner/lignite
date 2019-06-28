@@ -1,3 +1,4 @@
+# typed: true
 # https://github.com/larskanis/libusb
 require "libusb"
 

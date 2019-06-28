@@ -1,3 +1,4 @@
+# typed: false
 # This file is generated from ev3.yml. DO NOT EDIT.
 
 module Lignite

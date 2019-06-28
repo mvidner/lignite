@@ -1,3 +1,4 @@
+# typed: false
 require "lignite"
 require "thor"
 require "fileutils"

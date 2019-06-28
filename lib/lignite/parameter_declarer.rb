@@ -1,3 +1,4 @@
+# typed: false
 module Lignite
   # Methods for user programs that declare subroutine parameters.
   module ParameterDeclarer

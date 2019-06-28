@@ -1,3 +1,4 @@
+# typed: false
 module Lignite
   # Allocate local or global variables
   class Variables

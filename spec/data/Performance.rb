@@ -1,3 +1,4 @@
+# typed: false
 appv = "Performance V1.02"
 
 TIMES = 100_000

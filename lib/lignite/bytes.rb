@@ -1,3 +1,4 @@
+# typed: true
 module Lignite
   # Shortcut methods to convert between data and their byte representation
   module Bytes

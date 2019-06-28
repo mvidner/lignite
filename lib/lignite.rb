@@ -1,3 +1,4 @@
+# typed: true
 require "lignite/bytes"
 require "lignite/logger"
 

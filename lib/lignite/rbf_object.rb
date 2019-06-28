@@ -1,3 +1,4 @@
+# typed: true
 module Lignite
   # Part of an assembled RBF file
   class RbfObject

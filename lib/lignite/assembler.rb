@@ -1,3 +1,4 @@
+# typed: true
 require "lignite/rbf_declarer"
 require "lignite/variables"
 

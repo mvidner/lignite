@@ -1,4 +1,5 @@
 #!/usr/bin/ruby
+# typed: false
 require "lignite"
 
 # A Bobcat like two-tracked forklift.

@@ -1,3 +1,4 @@
+# typed: false
 module Lignite
   # Extends {OpCompiler} by
   # - variable declarations: {VariableDeclarer}

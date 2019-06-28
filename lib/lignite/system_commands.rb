@@ -1,3 +1,4 @@
+# typed: true
 module Lignite
   # The commands that cannot appear in a .rbf program,
   # used mostly for program manipulation

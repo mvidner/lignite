@@ -1,3 +1,4 @@
+# typed: false
 module Lignite
   # Send {DirectCommands} to motors.
   # It's called Motors instead of Motor because some methods are designed

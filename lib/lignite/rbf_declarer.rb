@@ -1,3 +1,4 @@
+# typed: true
 require "lignite/parameter_declarer"
 require "lignite/variables"
 
